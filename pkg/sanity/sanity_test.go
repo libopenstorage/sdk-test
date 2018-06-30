@@ -43,12 +43,6 @@ func TestSanity(t *testing.T) {
 	if err := kvdb.SetInstance(kv); err != nil {
 		t.Fatalf("Failed to set KVDB instance")
 	}
-
-	// Register the in-memory driver
-	if err := volumedrivers.Register("fake", map[string]string{}); err != nil {
-		t.Fatalf("Unable to start driver")
-	}
-
 	// Initialize the cluster
 	if err := cluster.Init(osdconfig.ClusterConfig{
 		ClusterId:     "cluster",
@@ -56,6 +50,10 @@ func TestSanity(t *testing.T) {
 		DefaultDriver: "fake",
 	}); err != nil {
 		t.Fatalf("Unable to init cluster server: %v", err)
+	}
+	// Register the in-memory driver
+	if err := volumedrivers.Register("fake", map[string]string{}); err != nil {
+		t.Fatalf("Unable to start driver: %s", err)
 	}
 	cm, err := cluster.Inst()
 	if err != nil {
