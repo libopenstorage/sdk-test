@@ -2,6 +2,119 @@
 
 
 [[projects]]
+  name = "github.com/Microsoft/go-winio"
+  packages = ["."]
+  revision = "67921128fb397dd80339870d2193d6b1e6856fd4"
+  version = "v0.4.8"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/armon/go-metrics"
+  packages = ["."]
+  revision = "58588f401c2cc130a7308a52ca3bc6c0a76db04b"
+
+[[projects]]
+  name = "github.com/aws/aws-sdk-go"
+  packages = [
+    "aws",
+    "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/corehandlers",
+    "aws/credentials",
+    "aws/credentials/ec2rolecreds",
+    "aws/credentials/endpointcreds",
+    "aws/credentials/stscreds",
+    "aws/csm",
+    "aws/defaults",
+    "aws/ec2metadata",
+    "aws/endpoints",
+    "aws/request",
+    "aws/session",
+    "aws/signer/v4",
+    "internal/sdkio",
+    "internal/sdkrand",
+    "internal/shareddefaults",
+    "private/protocol",
+    "private/protocol/ec2query",
+    "private/protocol/json/jsonutil",
+    "private/protocol/jsonrpc",
+    "private/protocol/query",
+    "private/protocol/query/queryutil",
+    "private/protocol/rest",
+    "private/protocol/xml/xmlutil",
+    "service/ec2",
+    "service/opsworks",
+    "service/sts"
+  ]
+  revision = "852052a10992d92f68b9a60862a3312292524903"
+  version = "v1.14.17"
+
+[[projects]]
+  name = "github.com/cenkalti/backoff"
+  packages = ["."]
+  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
+  version = "v2.0.0"
+
+[[projects]]
+  name = "github.com/cloudfoundry/gosigar"
+  packages = [
+    ".",
+    "sys/windows"
+  ]
+  revision = "dcb1afc219e4c99f21c37fb1ec22ed9ffe443317"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/docker/docker"
+  packages = [
+    "daemon/graphdriver",
+    "daemon/graphdriver/btrfs",
+    "pkg/archive",
+    "pkg/chrootarchive",
+    "pkg/fileutils",
+    "pkg/idtools",
+    "pkg/ioutils",
+    "pkg/longpath",
+    "pkg/mount",
+    "pkg/plugins",
+    "pkg/plugins/transport",
+    "pkg/pools",
+    "pkg/promise",
+    "pkg/reexec",
+    "pkg/system"
+  ]
+  revision = "4a7bd7eaef0038b006cf23adface84081e5aab3b"
+
+[[projects]]
+  name = "github.com/docker/go-connections"
+  packages = [
+    "sockets",
+    "tlsconfig"
+  ]
+  revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
+  version = "v0.3.0"
+
+[[projects]]
+  name = "github.com/docker/go-units"
+  packages = ["."]
+  revision = "47565b4f722fb6ceae66b95f853feed578a4a51c"
+  version = "v0.3.3"
+
+[[projects]]
+  name = "github.com/go-ini/ini"
+  packages = ["."]
+  revision = "06f5f3d67269ccec1fe5fe4134ba6e982984f7f5"
+  version = "v1.37.0"
+
+[[projects]]
   name = "github.com/golang/protobuf"
   packages = [
     "jsonpb",
@@ -28,9 +141,109 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/hashicorp/errwrap"
+  packages = ["."]
+  revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-immutable-radix"
+  packages = ["."]
+  revision = "7f3cd4390caab3250a57f30efdb2a65dd7649ecf"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-msgpack"
+  packages = ["codec"]
+  revision = "fa3f63826f7c23912c15263591e65d54d080b458"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-multierror"
+  packages = ["."]
+  revision = "b7773ae218740a7be65057fc60b366a49b538a44"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/golang-lru"
+  packages = ["simplelru"]
+  revision = "0fb14efe8c47ae851c0034ed7a448854d3d34cf3"
+
+[[projects]]
+  name = "github.com/hashicorp/logutils"
+  packages = ["."]
+  revision = "0dc08b1671f34c4250ce212759ebd880f743d883"
+
+[[projects]]
+  name = "github.com/hashicorp/memberlist"
+  packages = ["."]
+  revision = "7c7d6bae440fb7c6dcde850672e0f68263f9e29c"
+
+[[projects]]
+  name = "github.com/jmespath/go-jmespath"
+  packages = ["."]
+  revision = "0b12d6b5"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/libopenstorage/gossip"
+  packages = [
+    ".",
+    "proto",
+    "proto/state",
+    "types"
+  ]
+  revision = "b3655d98ea02660f2e543d62f6af728a0c324116"
+
+[[projects]]
+  branch = "master"
   name = "github.com/libopenstorage/openstorage"
-  packages = ["api"]
+  packages = [
+    "api",
+    "api/client",
+    "api/client/volume",
+    "cluster",
+    "config",
+    "objectstore",
+    "osdconfig",
+    "pkg/chaos",
+    "pkg/chattr",
+    "pkg/dbg",
+    "pkg/keylock",
+    "pkg/mount",
+    "pkg/options",
+    "pkg/proto/time",
+    "pkg/sched",
+    "pkg/seed",
+    "pkg/storageops",
+    "pkg/storageops/aws",
+    "schedpolicy",
+    "secrets",
+    "volume",
+    "volume/drivers",
+    "volume/drivers/aws",
+    "volume/drivers/btrfs",
+    "volume/drivers/buse",
+    "volume/drivers/common",
+    "volume/drivers/coprhd",
+    "volume/drivers/fake",
+    "volume/drivers/nfs",
+    "volume/drivers/pwx",
+    "volume/drivers/vfs"
+  ]
   revision = "bc4a725be66d20f1778ba9fa71c0fc922018eac1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/libopenstorage/systemutils"
+  packages = ["."]
+  revision = "dc0e35340804a0ada0792a3c9ce51d33ddd53cc8"
+
+[[projects]]
+  name = "github.com/miekg/dns"
+  packages = ["."]
+  revision = "5a2b9fab83ff0f8bfc99684bd5f43a37abe560f1"
+  version = "v1.0.8"
 
 [[projects]]
   branch = "master"
@@ -83,9 +296,88 @@
   version = "v1.4.0"
 
 [[projects]]
+  name = "github.com/opencontainers/runc"
+  packages = [
+    "libcontainer/label",
+    "libcontainer/selinux",
+    "libcontainer/system"
+  ]
+  revision = "1a124e9c2da68c867ed2c4f4ff19f0cd95cda0cd"
+  version = "v0.0.8"
+
+[[projects]]
+  name = "github.com/pborman/uuid"
+  packages = ["."]
+  revision = "e790cca94e6cc75c7064b1332e63811d4aae1a53"
+  version = "v1.1"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "logrus-lowercase"
+  name = "github.com/portworx/kvdb"
+  packages = [
+    ".",
+    "common",
+    "mem"
+  ]
+  revision = "fb8ec703caad98c89d77a619c18eedf98bd1a242"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/portworx/sched-ops"
+  packages = ["task"]
+  revision = "19127b8e3d4c00e917da32dcb91cf64400fc91d8"
+
+[[projects]]
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
+
+[[projects]]
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
+
+[[projects]]
+  name = "github.com/vbatts/tar-split"
+  packages = ["tar/storage"]
+  revision = "38ec4ddb06dedbea0a895c4848b248eb38af221b"
+  version = "v0.10.2"
+
+[[projects]]
+  branch = "master"
+  name = "go.pedge.io/proto"
+  packages = ["time"]
+  revision = "671bc5dde355c10447e5f4c6d05cf9dcf69be068"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "ssh/terminal"
+  ]
+  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = [
+    "bpf",
     "context",
     "html",
     "html/atom",
@@ -94,7 +386,13 @@
     "http2",
     "http2/hpack",
     "idna",
+    "internal/iana",
+    "internal/socket",
+    "internal/socks",
     "internal/timeseries",
+    "ipv4",
+    "ipv6",
+    "proxy",
     "trace"
   ]
   revision = "4cb1c02c05b0e749b0365f61ae859a8e0cfceed9"
@@ -102,7 +400,10 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "7138fd3d9dc8335c567ca206f4333fb75eb05d56"
 
 [[projects]]
@@ -180,6 +481,12 @@
   version = "v1.13.0"
 
 [[projects]]
+  name = "gopkg.in/jmcvetta/napping.v3"
+  packages = ["."]
+  revision = "4c7b4b235c63152afa9a1c6384e708e0fbfd77ca"
+  version = "v3.2.0"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
@@ -188,6 +495,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "88006a30011a4d172ee6c638a2049045fac296168a702491dc0e3c1ec9975c72"
+  inputs-digest = "05c3926db8f1ae08c4c80702df52d7f9bd512359ec8b27d8f42051b96e81f0fe"
   solver-name = "gps-cdcl"
   solver-version = 1

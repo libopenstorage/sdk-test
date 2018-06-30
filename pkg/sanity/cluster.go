@@ -1,5 +1,5 @@
 /*
-Copyright 2018 Luis Pabón luis@portworx.com
+Copyright 2018 Portworx
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@ limitations under the License.
 package sanity
 
 import (
-	"fmt"
+	//"google.golang.org/grpc/codes"
+	//"google.golang.org/grpc/status"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	sdk "github.com/libopenstorage/openstorage/api"
-	context "golang.org/x/net/context"
+	"context"
+	"github.com/libopenstorage/openstorage/api"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -31,14 +29,17 @@ import (
 
 var _ = Describe("Enumerate [OpenStorageCluster]", func() {
 	var (
-		c sdk.OpenStorageClusterClient
+		c api.OpenStorageClusterClient
 	)
 
 	BeforeEach(func() {
-		c = sdk.NewOpenStorageClusterClient(conn)
+		c = api.NewOpenStorageClusterClient(conn)
 	})
 
 	It("should return a cluster id", func() {
-
+		info, err := c.Enumerate(context.Background(),
+			&api.SdkClusterEnumerateRequest{})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(info.Cluster).NotTo(BeNil())
 	})
 })

@@ -17,12 +17,16 @@ limitations under the License.
 package sanity
 
 import (
+	"context"
 	"fmt"
-	"io/ioutil"
+	"net"
+	"net/url"
 	"sync"
 	"testing"
+	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,15 +38,8 @@ var (
 	lock   sync.Mutex
 )
 
-// CloudBackupConfig struct for cloud backup configuration
-type CloudBackupConfig struct {
-	//CloudProvider string `yaml:"providers"`
-	// map[string]string is volume.VolumeParams equivalent
-	CloudProviders map[string]map[string]string
-}
-
 type SanityConfiguration struct {
-	Endpoint string
+	Address string
 }
 
 // Test will test start the sanity tests
@@ -59,10 +56,41 @@ var _ = BeforeSuite(func() {
 	var err error
 
 	By("connecting to OpenStorage SDK endpoint")
-	conn, err = utils.Connect(config.Address)
+	conn, err = connect(config.Address)
 	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {
 	conn.Close()
 })
+
+// Connect address by grpc
+func connect(address string) (*grpc.ClientConn, error) {
+	dialOptions := []grpc.DialOption{
+		grpc.WithInsecure(),
+	}
+	u, err := url.Parse(address)
+	if err == nil && (!u.IsAbs() || u.Scheme == "unix") {
+		dialOptions = append(dialOptions,
+			grpc.WithDialer(
+				func(addr string, timeout time.Duration) (net.Conn, error) {
+					return net.DialTimeout("unix", u.Path, timeout)
+				}))
+	}
+
+	conn, err := grpc.Dial(address, dialOptions...)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	for {
+		if !conn.WaitForStateChange(ctx, conn.GetState()) {
+			return conn, fmt.Errorf("Connection timed out")
+		}
+		if conn.GetState() == connectivity.Ready {
+			return conn, nil
+		}
+	}
+}

@@ -24,6 +24,7 @@
 #   go-tests = true
 #   unused-packages = true
 
+ignored = ["github.com/Sirupsen/logrus*"]
 
 [[constraint]]
   name = "github.com/libopenstorage/openstorage"
@@ -44,6 +45,10 @@
 [[constraint]]
   name = "google.golang.org/grpc"
   version = "1.13.0"
+
+[[override]]
+  name = "github.com/docker/docker"
+  revision = "4a7bd7eaef0038b006cf23adface84081e5aab3b"
 
 [prune]
   go-tests = true
