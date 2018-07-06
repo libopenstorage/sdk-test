@@ -38,8 +38,16 @@ var (
 	lock   sync.Mutex
 )
 
+// CloudProviderConfig struct for cloud providers configuration
+type CloudProviderConfig struct {
+	//CloudProvider string `yaml:"providers"`
+	// map[string]string is volume.VolumeParams equivalent
+	CloudProviders map[string]map[string]string
+}
+
 type SanityConfiguration struct {
-	Address string
+	Address        string
+	ProviderConfig *CloudProviderConfig
 }
 
 // Test will test start the sanity tests

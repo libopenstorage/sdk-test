@@ -18,9 +18,11 @@ package sanity
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"testing"
 
 	"github.com/libopenstorage/sdk-test/pkg/sanity"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (
@@ -28,18 +30,24 @@ const (
 )
 
 var (
-	VERSION  = "(dev)"
-	endpoint string
-	version  bool
+	VERSION                 = "(dev)"
+	endpoint                string
+	version                 bool
+	cloudProviderConfigPath string
 )
 
 func init() {
 	flag.StringVar(&endpoint, prefix+"endpoint", "", "OpenStorage SDK endpoint")
 	flag.BoolVar(&version, prefix+"version", false, "Version of this program")
+	flag.StringVar(&cloudProviderConfigPath, prefix+"cpg", "", "Cloud Provider config file , optional")
 	flag.Parse()
 }
 
 func TestSanity(t *testing.T) {
+
+	var cfg *sanity.CloudProviderConfig
+	var err error
+
 	if version {
 		fmt.Printf("Version = %s\n", VERSION)
 		return
@@ -48,7 +56,34 @@ func TestSanity(t *testing.T) {
 		t.Fatalf("--%s.endpoint must be provided with an OpenStorage SDK endpoint", prefix)
 	}
 
+	if len(cloudProviderConfigPath) == 0 {
+		t.Logf("No Cloud provider config file provided , Cloud related Tests will be skipped")
+		cfg = &sanity.CloudProviderConfig{}
+	}
+
+	if len(cloudProviderConfigPath) != 0 {
+		cfg, err = cloudProviderConfigParse(cloudProviderConfigPath)
+		if err != nil {
+			t.Logf("Error parsing cloud provider Config , skipping cloud related tests")
+		}
+	}
 	sanity.Test(t, &sanity.SanityConfiguration{
-		Address: endpoint,
+		Address:        endpoint,
+		ProviderConfig: cfg,
 	})
+}
+
+// cloudProviderConfigParse parses the config file of cloud provider
+func cloudProviderConfigParse(filePath string) (*sanity.CloudProviderConfig, error) {
+
+	config := &sanity.CloudProviderConfig{}
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to read the Cloud provider configuration file (%s): %s", filePath, err.Error())
+	}
+	if err := yaml.Unmarshal(data, config); err != nil {
+		return nil, fmt.Errorf("Unable to parse Cloud provider configuration: %s", err.Error())
+	}
+	return config, nil
+
 }
