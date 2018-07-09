@@ -2,6 +2,8 @@ package sanity
 
 import (
 	"context"
+	"math/rand"
+	"time"
 
 	"github.com/libopenstorage/openstorage/api"
 	. "github.com/onsi/gomega"
@@ -66,4 +68,13 @@ func numberOfVolumesInCluster(c api.OpenStorageVolumeClient) int {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(res).NotTo(BeNil())
 	return len(res.VolumeIds)
+}
+
+//Returns an in between min and max. Min - included, Max excluded. So mathematically [min, max)
+func random(min, max int) int {
+	if max == min {
+		return max
+	}
+	rand.Seed(time.Now().Unix())
+	return rand.Intn(max-min) + min
 }
