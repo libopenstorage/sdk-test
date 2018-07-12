@@ -886,12 +886,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				&api.SdkVolumeCloneRequest{
 					Name:     "cloned-vol",
 					ParentId: volID,
-					Spec: &api.VolumeSpec{
-						Size: uint64(5 * GIGABYTE),
-						VolumeLabels: map[string]string{
-							"test": "clone",
-						},
-					},
 				},
 			)
 

@@ -37,8 +37,8 @@ var _ = Describe("Enumerate [OpenStorageCluster]", func() {
 	})
 
 	It("should return a cluster id", func() {
-		info, err := c.Enumerate(context.Background(),
-			&api.SdkClusterEnumerateRequest{})
+		info, err := c.InspectCurrent(context.Background(),
+			&api.SdkClusterInspectCurrentRequest{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(info.Cluster).NotTo(BeNil())
 	})
