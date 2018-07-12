@@ -105,11 +105,15 @@ const (
 
 // Api clientserver Constants
 const (
-	OsdVolumePath   = "osd-volumes"
-	OsdSnapshotPath = "osd-snapshot"
-	OsdCredsPath    = "osd-creds"
-	OsdBackupPath   = "osd-backup"
-	TimeLayout      = "Jan 2 15:04:05 UTC 2006"
+	OsdVolumePath        = "osd-volumes"
+	OsdSnapshotPath      = "osd-snapshot"
+	OsdCredsPath         = "osd-creds"
+	OsdBackupPath        = "osd-backup"
+	OsdMigratePath       = "osd-migrate"
+	OsdMigrateStartPath  = OsdMigratePath + "/start"
+	OsdMigrateCancelPath = OsdMigratePath + "/cancel"
+	OsdMigrateStatusPath = OsdMigratePath + "/status"
+	TimeLayout           = "Jan 2 15:04:05 UTC 2006"
 )
 
 const (
@@ -695,12 +699,6 @@ func (c *Cluster) ToStorageCluster() *StorageCluster {
 	cluster := &StorageCluster{
 		Status: c.Status,
 		Id:     c.Id,
-		NodeId: c.NodeId,
-	}
-
-	cluster.NodeIds = make([]string, len(c.Nodes))
-	for i, v := range c.Nodes {
-		cluster.NodeIds[i] = v.Id
 	}
 
 	return cluster
@@ -748,14 +746,15 @@ func (b *CloudBackupInfo) ToSdkCloudBackupInfo() *SdkCloudBackupInfo {
 }
 
 func (r *CloudBackupEnumerateResponse) ToSdkCloudBackupEnumerateResponse() *SdkCloudBackupEnumerateResponse {
-	ids := make([]string, len(r.Backups))
-	for i, backup := range r.Backups {
-		ids[i] = backup.ID
+	resp := &SdkCloudBackupEnumerateResponse{
+		Backups: make([]*SdkCloudBackupInfo, len(r.Backups)),
 	}
 
-	return &SdkCloudBackupEnumerateResponse{
-		BackupIds: ids,
+	for i, v := range r.Backups {
+		resp.Backups[i] = v.ToSdkCloudBackupInfo()
 	}
+
+	return resp
 }
 
 func CloudBackupOpTypeToSdkCloudBackupOpType(t CloudBackupOpType) SdkCloudBackupOpType {
