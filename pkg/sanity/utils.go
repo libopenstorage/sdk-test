@@ -67,3 +67,58 @@ func numberOfVolumesInCluster(c api.OpenStorageVolumeClient) int {
 	Expect(res).NotTo(BeNil())
 	return len(res.VolumeIds)
 }
+
+// This will create credential for provider listed from cb.yaml file
+func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int {
+	numCredCreated := 0
+	for provider, providerParams := range config.ProviderConfig.CloudProviders {
+		if provider == "aws" {
+			credReq := &api.SdkCredentialCreateRequest{
+				CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
+					AwsCredential: &api.SdkAwsCredentialRequest{
+						AccessKey: providerParams["CredAccessKey"],
+						SecretKey: providerParams["CredSecretKey"],
+						Endpoint:  providerParams["CredEndpoint"],
+						Region:    providerParams["CredRegion"],
+					},
+				},
+			}
+
+			credResp, err := credClient.Create(context.Background(), credReq)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
+			numCredCreated++
+
+		} else if provider == "azure" {
+			credReq := &api.SdkCredentialCreateRequest{
+				CredentialType: &api.SdkCredentialCreateRequest_AzureCredential{
+					AzureCredential: &api.SdkAzureCredentialRequest{
+						AccountKey:  providerParams["CredAccountName"],
+						AccountName: providerParams["CredAccountKey"],
+					},
+				},
+			}
+
+			credResp, err := credClient.Create(context.Background(), credReq)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
+			numCredCreated++
+
+		} else if provider == "google" {
+			credReq := &api.SdkCredentialCreateRequest{
+				CredentialType: &api.SdkCredentialCreateRequest_GoogleCredential{
+					GoogleCredential: &api.SdkGoogleCredentialRequest{
+						ProjectId: providerParams["CredProjectID"],
+						JsonKey:   providerParams["CredJsonKey"],
+					},
+				},
+			}
+
+			credResp, err := credClient.Create(context.Background(), credReq)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
+			numCredCreated++
+		}
+	}
+	return numCredCreated
+}
