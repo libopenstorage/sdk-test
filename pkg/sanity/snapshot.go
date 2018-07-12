@@ -45,11 +45,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			)
 			Expect(err).ToNot(HaveOccurred())
 
-			_, err = c.Delete(context.Background(),
-				&api.SdkVolumeDeleteRequest{VolumeId: volID},
-			)
-			Expect(err).ToNot(HaveOccurred())
-
 		})
 
 		It("Should create Volume successfully for snapshot", func() {
@@ -236,11 +231,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		AfterEach(func() {
 			var err error
-
-			_, err = c.Delete(context.Background(),
-				&api.SdkVolumeDeleteRequest{VolumeId: volID},
-			)
-			Expect(err).ToNot(HaveOccurred())
 
 			_, err = c.Delete(context.Background(),
 				&api.SdkVolumeDeleteRequest{VolumeId: volID},
