@@ -237,7 +237,7 @@
     "volume/drivers/pwx",
     "volume/drivers/vfs"
   ]
-  revision = "bc4a725be66d20f1778ba9fa71c0fc922018eac1"
+  revision = "57e6c12460020ddd545de791aefb78e79439cea2"
 
 [[projects]]
   branch = "master"
@@ -491,6 +491,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6da6fbf6a597cad4fc1da19c5c734378ca3ac86362b1d691ff069070a753ae8a"
+  inputs-digest = "556cfd630f58b738b9ece379eff77c760bdad05b7742bdfa6a6e35650fa6a59f"
   solver-name = "gps-cdcl"
   solver-version = 1
