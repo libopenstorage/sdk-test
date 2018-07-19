@@ -25,8 +25,10 @@ import (
 
 	"strings"
 
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/libopenstorage/openstorage/api"
 	"github.com/libopenstorage/openstorage/cluster"
+	clustermanager "github.com/libopenstorage/openstorage/cluster/manager"
 	"github.com/libopenstorage/openstorage/volume"
 	"github.com/libopenstorage/openstorage/volume/drivers/common"
 	"github.com/pborman/uuid"
@@ -93,7 +95,7 @@ func newFakeDriver(params map[string]string) (*driver, error) {
 		kv:                 kv,
 	}
 
-	inst.thisCluster, err = cluster.Inst()
+	inst.thisCluster, err = clustermanager.Inst()
 	if err != nil {
 		return nil, err
 	}
@@ -147,6 +149,8 @@ func (d *driver) Create(
 
 	if spec.Size == 0 {
 		return "", fmt.Errorf("Volume size cannot be zero")
+	} else if spec.GetHaLevel() == 0 {
+		return "", fmt.Errorf("HA level cannot be zero")
 	}
 
 	volumeID := strings.TrimSuffix(uuid.New(), "\n")
@@ -806,5 +810,21 @@ func (d *driver) CloudBackupSchedEnumerate() (*api.CloudBackupSchedEnumerateResp
 
 	return &api.CloudBackupSchedEnumerateResponse{
 		Schedules: schedules,
+	}, nil
+}
+
+func (d *driver) Catalog(volumeID, path, depth string) (api.CatalogResponse, error) {
+	return api.CatalogResponse{
+		Root: &api.Catalog{
+			Name:         "",
+			Path:         "/var/lib/osd/catalog/12345678",
+			Type:         "Directory",
+			Size:         4096,
+			LastModified: &timestamp.Timestamp{},
+		},
+		Report: &api.Report{
+			Directories: 0,
+			Files:       0,
+		},
 	}, nil
 }

@@ -21,6 +21,7 @@ import (
 
 	"github.com/libopenstorage/openstorage/api/server/sdk"
 	"github.com/libopenstorage/openstorage/cluster"
+	clustermanager "github.com/libopenstorage/openstorage/cluster/manager"
 	osdconfig "github.com/libopenstorage/openstorage/config"
 	"github.com/libopenstorage/openstorage/objectstore"
 	"github.com/libopenstorage/openstorage/schedpolicy"
@@ -44,7 +45,7 @@ func TestSanity(t *testing.T) {
 		t.Fatalf("Failed to set KVDB instance")
 	}
 	// Initialize the cluster
-	if err := cluster.Init(osdconfig.ClusterConfig{
+	if err := clustermanager.Init(osdconfig.ClusterConfig{
 		ClusterId:     "cluster",
 		NodeId:        "1",
 		DefaultDriver: "fake",
@@ -55,7 +56,7 @@ func TestSanity(t *testing.T) {
 	if err := volumedrivers.Register("fake", map[string]string{}); err != nil {
 		t.Fatalf("Unable to start driver: %s", err)
 	}
-	cm, err := cluster.Inst()
+	cm, err := clustermanager.Inst()
 	if err != nil {
 		t.Fatalf("Unable to find cluster instance: %v", err)
 	}
