@@ -21,12 +21,8 @@ import (
 	//"google.golang.org/grpc/status"
 
 	"context"
-	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/libopenstorage/openstorage/api"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	api "github.com/libopenstorage/openstorage-sdk-clients/sdk/golang"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

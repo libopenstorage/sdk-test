@@ -3,7 +3,7 @@ package sanity
 import (
 	"context"
 
-	"github.com/libopenstorage/openstorage/api"
+	api "github.com/libopenstorage/openstorage-sdk-clients/sdk/golang"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
