@@ -186,7 +186,8 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			req := &api.SdkVolumeCreateRequest{
 				Name: "inspect-vol",
 				Spec: &api.VolumeSpec{
-					Size: uint64(5 * GIGABYTE),
+					Size:    uint64(5 * GIGABYTE),
+					HaLevel: 2,
 				},
 			}
 			createResponse, err := c.Create(context.Background(), req)
@@ -249,7 +250,8 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			req := &api.SdkVolumeCreateRequest{
 				Name: "delete-vol",
 				Spec: &api.VolumeSpec{
-					Size: uint64(5 * GIGABYTE),
+					Size:    uint64(5 * GIGABYTE),
+					HaLevel: 3,
 				},
 			}
 			createResponse, err := c.Create(context.Background(), req)
@@ -458,7 +460,8 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			req := &api.SdkVolumeCreateRequest{
 				Name: "attach-vol",
 				Spec: &api.VolumeSpec{
-					Size: uint64(5 * GIGABYTE),
+					Size:    uint64(5 * GIGABYTE),
+					HaLevel: 1,
 				},
 			}
 			createResponse, err := c.Create(context.Background(), req)
@@ -552,7 +555,8 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			req := &api.SdkVolumeCreateRequest{
 				Name: "detach-vol",
 				Spec: &api.VolumeSpec{
-					Size: uint64(5 * GIGABYTE),
+					Size:    uint64(5 * GIGABYTE),
+					HaLevel: 3,
 				},
 			}
 			createResponse, err := c.Create(context.Background(), req)
@@ -709,7 +713,8 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			req := &api.SdkVolumeCreateRequest{
 				Name: "mount-vol",
 				Spec: &api.VolumeSpec{
-					Size: uint64(5 * GIGABYTE),
+					Size:    uint64(5 * GIGABYTE),
+					HaLevel: 3,
 				},
 			}
 			createResponse, err := c.Create(context.Background(), req)
@@ -867,7 +872,8 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			req := &api.SdkVolumeCreateRequest{
 				Name: "volume-to-be-cloned",
 				Spec: &api.VolumeSpec{
-					Size: uint64(5 * GIGABYTE),
+					Size:    uint64(5 * GIGABYTE),
+					HaLevel: 2,
 				},
 			}
 			createResponse, err := c.Create(context.Background(), req)

@@ -201,10 +201,12 @@
   packages = [
     "api",
     "api/client",
+    "api/client/cluster",
     "api/client/volume",
     "api/server/sdk",
     "api/spec",
     "cluster",
+    "cluster/manager",
     "config",
     "objectstore",
     "osdconfig",
@@ -237,7 +239,7 @@
     "volume/drivers/pwx",
     "volume/drivers/vfs"
   ]
-  revision = "57e6c12460020ddd545de791aefb78e79439cea2"
+  revision = "6eaee7bb8bdee7912ad5b9922abe8c499c56aaa4"
 
 [[projects]]
   branch = "master"
