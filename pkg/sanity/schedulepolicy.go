@@ -92,12 +92,14 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
-						Schedule: &api.SdkSchedulePolicyInterval{
-							Retain: 2,
-							PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-								Daily: &api.SdkSchedulePolicyIntervalDaily{
-									Hour:   12,
-									Minute: 30,
+						Schedules: []*api.SdkSchedulePolicyInterval{
+							&api.SdkSchedulePolicyInterval{
+								Retain: 2,
+								PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+									Daily: &api.SdkSchedulePolicyIntervalDaily{
+										Hour:   12,
+										Minute: 30,
+									},
 								},
 							},
 						},
@@ -119,19 +121,20 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
-						Schedule: &api.SdkSchedulePolicyInterval{
-							Retain: 2,
-							PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
-								Weekly: &api.SdkSchedulePolicyIntervalWeekly{
-									Day:    api.SdkTimeWeekday_SdkTimeWeekdaySunday,
-									Hour:   12,
-									Minute: 30,
+						Schedules: []*api.SdkSchedulePolicyInterval{
+							&api.SdkSchedulePolicyInterval{
+								Retain: 2,
+								PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
+									Weekly: &api.SdkSchedulePolicyIntervalWeekly{
+										Day:    api.SdkTimeWeekday_SdkTimeWeekdaySunday,
+										Hour:   12,
+										Minute: 30,
+									},
 								},
 							},
 						},
 					},
-				},
-			)
+				})
 			Expect(err).To(HaveOccurred())
 			Expect(resp).To(BeNil())
 			serverError, ok := status.FromError(err)
@@ -146,13 +149,15 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
-						Schedule: &api.SdkSchedulePolicyInterval{
-							Retain: 0,
-							PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
-								Weekly: &api.SdkSchedulePolicyIntervalWeekly{
-									Day:    api.SdkTimeWeekday_SdkTimeWeekdaySunday,
-									Hour:   12,
-									Minute: 30,
+						Schedules: []*api.SdkSchedulePolicyInterval{
+							&api.SdkSchedulePolicyInterval{
+								Retain: 0,
+								PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
+									Weekly: &api.SdkSchedulePolicyIntervalWeekly{
+										Day:    api.SdkTimeWeekday_SdkTimeWeekdaySunday,
+										Hour:   12,
+										Minute: 30,
+									},
 								},
 							},
 						},
@@ -171,8 +176,8 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				context.Background(),
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
-						Name:     policyName,
-						Schedule: nil,
+						Name:      policyName,
+						Schedules: nil,
 					},
 				},
 			)
@@ -205,13 +210,15 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
-						Schedule: &api.SdkSchedulePolicyInterval{
-							Retain: 4,
-							PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
-								Weekly: &api.SdkSchedulePolicyIntervalWeekly{
-									Day:    api.SdkTimeWeekday_SdkTimeWeekdaySunday,
-									Hour:   12,
-									Minute: 30,
+						Schedules: []*api.SdkSchedulePolicyInterval{
+							&api.SdkSchedulePolicyInterval{
+								Retain: 4,
+								PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
+									Weekly: &api.SdkSchedulePolicyIntervalWeekly{
+										Day:    api.SdkTimeWeekday_SdkTimeWeekdaySunday,
+										Hour:   12,
+										Minute: 30,
+									},
 								},
 							},
 						},
@@ -312,12 +319,14 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			policy := &api.SdkSchedulePolicyCreateRequest{
 				SchedulePolicy: &api.SdkSchedulePolicy{
 					Name: policyName,
-					Schedule: &api.SdkSchedulePolicyInterval{
-						Retain: 2,
-						PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-							Daily: &api.SdkSchedulePolicyIntervalDaily{
-								Hour:   12,
-								Minute: 30,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							Retain: 2,
+							PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+								Daily: &api.SdkSchedulePolicyIntervalDaily{
+									Hour:   12,
+									Minute: 30,
+								},
 							},
 						},
 					},
@@ -348,10 +357,11 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResponse).NotTo(BeNil())
 			Expect(inspectResponse.Policy.Name).To(BeEquivalentTo(policy.SchedulePolicy.Name))
-			Expect(inspectResponse.Policy.Schedule.Retain).To(BeEquivalentTo(policy.SchedulePolicy.Schedule.Retain))
+			Expect(inspectResponse.GetPolicy().GetSchedules()).To(HaveLen(len(policy.GetSchedulePolicy().GetSchedules())))
+			Expect(inspectResponse.Policy.GetSchedules()[0].Retain).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].Retain))
 
-			Expect(inspectResponse.Policy.Schedule.GetDaily().Hour).To(BeEquivalentTo(policy.SchedulePolicy.Schedule.GetDaily().Hour))
-			Expect(inspectResponse.Policy.Schedule.GetDaily().Minute).To(BeEquivalentTo(policy.SchedulePolicy.Schedule.GetDaily().Minute))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetDaily().Hour).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetDaily().Hour))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetDaily().Minute).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetDaily().Minute))
 		})
 
 		// TODO: Fake Driver to throw error when inspecting
@@ -439,12 +449,14 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 					&api.SdkSchedulePolicyCreateRequest{
 						SchedulePolicy: &api.SdkSchedulePolicy{
 							Name: policyName,
-							Schedule: &api.SdkSchedulePolicyInterval{
-								Retain: 2,
-								PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-									Daily: &api.SdkSchedulePolicyIntervalDaily{
-										Hour:   12,
-										Minute: 30,
+							Schedules: []*api.SdkSchedulePolicyInterval{
+								&api.SdkSchedulePolicyInterval{
+									Retain: 2,
+									PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+										Daily: &api.SdkSchedulePolicyIntervalDaily{
+											Hour:   12,
+											Minute: 30,
+										},
 									},
 								},
 							},
@@ -528,12 +540,14 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
-						Schedule: &api.SdkSchedulePolicyInterval{
-							Retain: 2,
-							PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-								Daily: &api.SdkSchedulePolicyIntervalDaily{
-									Hour:   11,
-									Minute: 45,
+						Schedules: []*api.SdkSchedulePolicyInterval{
+							&api.SdkSchedulePolicyInterval{
+								Retain: 2,
+								PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+									Daily: &api.SdkSchedulePolicyIntervalDaily{
+										Hour:   11,
+										Minute: 45,
+									},
 								},
 							},
 						},
@@ -553,13 +567,15 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			update := &api.SdkSchedulePolicyUpdateRequest{
 				SchedulePolicy: &api.SdkSchedulePolicy{
 					Name: policyName,
-					Schedule: &api.SdkSchedulePolicyInterval{
-						Retain: 5,
-						PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
-							Weekly: &api.SdkSchedulePolicyIntervalWeekly{
-								Day:    api.SdkTimeWeekday_SdkTimeWeekdayFriday,
-								Hour:   12,
-								Minute: 30,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							Retain: 5,
+							PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
+								Weekly: &api.SdkSchedulePolicyIntervalWeekly{
+									Day:    api.SdkTimeWeekday_SdkTimeWeekdayFriday,
+									Hour:   12,
+									Minute: 30,
+								},
 							},
 						},
 					},
@@ -583,10 +599,11 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResponse).NotTo(BeNil())
 			Expect(inspectResponse.Policy.Name).To(BeEquivalentTo(update.SchedulePolicy.Name))
-			Expect(inspectResponse.Policy.Schedule.Retain).
-				To(BeEquivalentTo(update.SchedulePolicy.Schedule.Retain))
-			Expect(inspectResponse.Policy.Schedule.GetWeekly().Day).
-				To(BeEquivalentTo(update.SchedulePolicy.Schedule.GetWeekly().Day))
+			Expect(inspectResponse.GetPolicy().GetSchedules()).To(HaveLen(len(update.GetSchedulePolicy().GetSchedules())))
+			Expect(inspectResponse.Policy.Schedules[0].Retain).
+				To(BeEquivalentTo(update.SchedulePolicy.Schedules[0].Retain))
+			Expect(inspectResponse.Policy.Schedules[0].GetWeekly().Day).
+				To(BeEquivalentTo(update.SchedulePolicy.Schedules[0].GetWeekly().Day))
 
 			// TODO: Fake driver should update all the fields that are requested
 			// in the update struct
@@ -606,12 +623,14 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
-						Schedule: &api.SdkSchedulePolicyInterval{
-							Retain: 2,
-							PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-								Daily: &api.SdkSchedulePolicyIntervalDaily{
-									Hour:   11,
-									Minute: 45,
+						Schedules: []*api.SdkSchedulePolicyInterval{
+							&api.SdkSchedulePolicyInterval{
+								Retain: 2,
+								PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+									Daily: &api.SdkSchedulePolicyIntervalDaily{
+										Hour:   11,
+										Minute: 45,
+									},
 								},
 							},
 						},
@@ -631,13 +650,15 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			update := &api.SdkSchedulePolicyUpdateRequest{
 				SchedulePolicy: &api.SdkSchedulePolicy{
 					Name: "policy-name-changed",
-					Schedule: &api.SdkSchedulePolicyInterval{
-						Retain: 5,
-						PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
-							Weekly: &api.SdkSchedulePolicyIntervalWeekly{
-								Day:    api.SdkTimeWeekday_SdkTimeWeekdayFriday,
-								Hour:   12,
-								Minute: 30,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							Retain: 5,
+							PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
+								Weekly: &api.SdkSchedulePolicyIntervalWeekly{
+									Day:    api.SdkTimeWeekday_SdkTimeWeekdayFriday,
+									Hour:   12,
+									Minute: 30,
+								},
 							},
 						},
 					},
@@ -662,13 +683,15 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			update := &api.SdkSchedulePolicyUpdateRequest{
 				SchedulePolicy: &api.SdkSchedulePolicy{
 					Name: policyName,
-					Schedule: &api.SdkSchedulePolicyInterval{
-						Retain: 5,
-						PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
-							Weekly: &api.SdkSchedulePolicyIntervalWeekly{
-								Day:    api.SdkTimeWeekday_SdkTimeWeekdayFriday,
-								Hour:   12,
-								Minute: 30,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							Retain: 5,
+							PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
+								Weekly: &api.SdkSchedulePolicyIntervalWeekly{
+									Day:    api.SdkTimeWeekday_SdkTimeWeekdayFriday,
+									Hour:   12,
+									Minute: 30,
+								},
 							},
 						},
 					},

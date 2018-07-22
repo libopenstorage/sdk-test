@@ -92,12 +92,14 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Creating a backup schedule on " + provider)
 
-				schedule := &api.SdkSchedulePolicyInterval{
-					Retain: 1,
-					PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-						Daily: &api.SdkSchedulePolicyIntervalDaily{
-							Hour:   0,
-							Minute: 30,
+				schedule := []*api.SdkSchedulePolicyInterval{
+					&api.SdkSchedulePolicyInterval{
+						Retain: 1,
+						PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+							Daily: &api.SdkSchedulePolicyIntervalDaily{
+								Hour:   0,
+								Minute: 30,
+							},
 						},
 					},
 				}
@@ -109,7 +111,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 							CredentialId: credID,
 							MaxBackups:   3,
 							SrcVolumeId:  volID,
-							Schedule:     schedule,
+							Schedules:    schedule,
 						},
 					},
 				)
@@ -128,12 +130,14 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Creating a backup schedule on " + provider)
 
-				schedule := &api.SdkSchedulePolicyInterval{
-					Retain: 1,
-					PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-						Daily: &api.SdkSchedulePolicyIntervalDaily{
-							Hour:   0,
-							Minute: 30,
+				schedule := []*api.SdkSchedulePolicyInterval{
+					&api.SdkSchedulePolicyInterval{
+						Retain: 1,
+						PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+							Daily: &api.SdkSchedulePolicyIntervalDaily{
+								Hour:   0,
+								Minute: 30,
+							},
 						},
 					},
 				}
@@ -145,7 +149,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 							CredentialId: credID,
 							MaxBackups:   3,
 							SrcVolumeId:  "volid-doesnt-exist",
-							Schedule:     schedule,
+							Schedules:    schedule,
 						},
 					},
 				)
@@ -168,12 +172,14 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Creating a backup schedule on " + provider)
 
-				schedule := &api.SdkSchedulePolicyInterval{
-					Retain: 1,
-					PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-						Daily: &api.SdkSchedulePolicyIntervalDaily{
-							Hour:   0,
-							Minute: -30,
+				schedule := []*api.SdkSchedulePolicyInterval{
+					&api.SdkSchedulePolicyInterval{
+						Retain: 1,
+						PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+							Daily: &api.SdkSchedulePolicyIntervalDaily{
+								Hour:   0,
+								Minute: -30,
+							},
 						},
 					},
 				}
@@ -185,7 +191,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 							CredentialId: credID,
 							MaxBackups:   3,
 							SrcVolumeId:  "volid-doesnt-exist",
-							Schedule:     schedule,
+							Schedules:    schedule,
 						},
 					},
 				)
@@ -207,12 +213,14 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Creating a backup schedule on " + provider)
 
-				schedule := &api.SdkSchedulePolicyInterval{
-					Retain: 1,
-					PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-						Daily: &api.SdkSchedulePolicyIntervalDaily{
-							Hour:   0,
-							Minute: 30,
+				schedule := []*api.SdkSchedulePolicyInterval{
+					&api.SdkSchedulePolicyInterval{
+						Retain: 1,
+						PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+							Daily: &api.SdkSchedulePolicyIntervalDaily{
+								Hour:   0,
+								Minute: 30,
+							},
 						},
 					},
 				}
@@ -224,7 +232,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 							CredentialId: credID,
 							MaxBackups:   3,
 							SrcVolumeId:  "",
-							Schedule:     schedule,
+							Schedules:    schedule,
 						},
 					},
 				)
@@ -263,12 +271,14 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Creating a backup schedule on " + provider)
 
-				schedule := &api.SdkSchedulePolicyInterval{
-					Retain: 1,
-					PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-						Daily: &api.SdkSchedulePolicyIntervalDaily{
-							Hour:   0,
-							Minute: 30,
+				schedule := []*api.SdkSchedulePolicyInterval{
+					&api.SdkSchedulePolicyInterval{
+						Retain: 1,
+						PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+							Daily: &api.SdkSchedulePolicyIntervalDaily{
+								Hour:   0,
+								Minute: 30,
+							},
 						},
 					},
 				}
@@ -280,7 +290,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 							CredentialId: credID,
 							MaxBackups:   3,
 							SrcVolumeId:  volID,
-							Schedule:     schedule,
+							Schedules:    schedule,
 						},
 					},
 				)
@@ -323,12 +333,14 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Creating a backup schedule on " + provider)
 
-				schedule := &api.SdkSchedulePolicyInterval{
-					Retain: 1,
-					PeriodType: &api.SdkSchedulePolicyInterval_Daily{
-						Daily: &api.SdkSchedulePolicyIntervalDaily{
-							Hour:   0,
-							Minute: 30,
+				schedule := []*api.SdkSchedulePolicyInterval{
+					&api.SdkSchedulePolicyInterval{
+						Retain: 1,
+						PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+							Daily: &api.SdkSchedulePolicyIntervalDaily{
+								Hour:   0,
+								Minute: 30,
+							},
 						},
 					},
 				}
@@ -340,7 +352,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 							CredentialId: credID,
 							MaxBackups:   3,
 							SrcVolumeId:  volID,
-							Schedule:     schedule,
+							Schedules:    schedule,
 						},
 					},
 				)
