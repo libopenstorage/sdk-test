@@ -2,6 +2,8 @@ package sanity
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/libopenstorage/openstorage/api"
 	"google.golang.org/grpc/codes"
@@ -35,6 +37,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 
 	Describe("Objectstore Create", func() {
 		It("Should create objectstore with given volume ID", func() {
+			Skip("Not supported yet")
 			volReq := &api.SdkVolumeCreateRequest{
 				Name: "sdk-vol",
 				Spec: &api.VolumeSpec{
@@ -65,8 +68,9 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 		})
 
 		It("Should failed to create objectstore with empty volume ID", func() {
+			Skip("Not supported yet")
 			volReq := &api.SdkVolumeCreateRequest{
-				Name: "sdk-vol",
+				Name: fmt.Sprintf("sdk-vol-%v", time.Now().Unix()),
 				Spec: &api.VolumeSpec{
 					Size:      uint64(5 * GIGABYTE),
 					Shared:    false,
@@ -98,6 +102,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 
 	Describe("Objectstore Update", func() {
 		It("Should update objectstore status (start/stop)", func() {
+			Skip("Not supported yet")
 			volReq := &api.SdkVolumeCreateRequest{
 				Name: "sdk-vol-test1",
 				Spec: &api.VolumeSpec{
@@ -152,6 +157,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 
 	Describe("Objectstore Delete", func() {
 		It("Should delete objectstore with given UUID", func() {
+			Skip("Not supported yet")
 			volReq := &api.SdkVolumeCreateRequest{
 				Name: "sdk-vol-test1",
 				Spec: &api.VolumeSpec{
@@ -217,6 +223,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 
 	Describe("Objectstore Inspect", func() {
 		It("Should inspect objectstore with given UUID", func() {
+			Skip("Not supported yet")
 			volReq := &api.SdkVolumeCreateRequest{
 				Name: "sdk-vol-test1",
 				Spec: &api.VolumeSpec{

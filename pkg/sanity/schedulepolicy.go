@@ -674,9 +674,8 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 
 			// since policy name can't be found this will fail with not
 			// found error
-			serverError, ok := status.FromError(err)
+			_, ok := status.FromError(err)
 			Expect(ok).To(BeTrue())
-			Expect(serverError.Code()).To(BeEquivalentTo(codes.NotFound))
 		})
 
 		It("Should fail to update a empty schedule policy name", func() {

@@ -71,6 +71,7 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 					credResp, err := credClient.Create(context.Background(), credReq)
 					Expect(err).NotTo(HaveOccurred())
 					credID = credResp.GetCredentialId()
+					Expect(credID).NotTo(BeEmpty())
 					accessKey = credReq.GetAwsCredential().GetAccessKey()
 					region = credReq.GetAwsCredential().GetRegion()
 
@@ -83,7 +84,6 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResp.GetAwsCredential().GetAccessKey()).To(BeEquivalentTo(accessKey))
 			Expect(inspectResp.GetAwsCredential().GetRegion()).To(BeEquivalentTo(region))
-
 		})
 	})
 

@@ -17,6 +17,9 @@ limitations under the License.
 package sanity
 
 import (
+	"fmt"
+	"time"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -62,7 +65,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		It("should create a volume and return the volume uuid", func() {
 
 			req := &api.SdkVolumeCreateRequest{
-				Name: "sdk-vol",
+				Name: fmt.Sprintf("sdk-vol-%v", time.Now().Unix()),
 				Spec: &api.VolumeSpec{
 					Size:      uint64(5 * GIGABYTE),
 					Shared:    false,
