@@ -243,6 +243,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/libopenstorage/openstorage-sdk-clients"
+  packages = ["sdk/golang"]
+  revision = "2dc602c362cd1da56dc6c5b4ad09cd09739de534"
+
+[[projects]]
+  branch = "master"
   name = "github.com/libopenstorage/systemutils"
   packages = ["."]
   revision = "dc0e35340804a0ada0792a3c9ce51d33ddd53cc8"
@@ -493,6 +499,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "556cfd630f58b738b9ece379eff77c760bdad05b7742bdfa6a6e35650fa6a59f"
+  inputs-digest = "dccf37c932cea6b16b4b7394402468085ee8d3f4ad0f7d034db35b59998f5541"
   solver-name = "gps-cdcl"
   solver-version = 1
