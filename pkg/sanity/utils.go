@@ -122,3 +122,99 @@ func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int 
 	}
 	return numCredCreated
 }
+
+func newTestVolume(volClient api.OpenStorageVolumeClient) string {
+	volReq := &api.SdkVolumeCreateRequest{
+		Name: "sdk-vol",
+		Spec: &api.VolumeSpec{
+			Size:             uint64(5 * GIGABYTE),
+			AggregationLevel: 2,
+			Encrypted:        true,
+			Shared:           false,
+			HaLevel:          3,
+			IoProfile:        api.IoProfile_IO_PROFILE_DB,
+			Cos:              api.CosType_HIGH,
+			Sticky:           true,
+			Format:           api.FSType_FS_TYPE_XFS,
+		},
+	}
+	volResp, err := volClient.Create(context.Background(), volReq)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(volResp).NotTo(BeNil())
+	Expect(volResp.VolumeId).NotTo(BeEmpty())
+	volID := volResp.VolumeId
+	return volID
+}
+
+func newTestCredential(credClient api.OpenStorageCredentialsClient) string {
+	credReq := &api.SdkCredentialCreateRequest{
+		CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
+			AwsCredential: &api.SdkAwsCredentialRequest{
+				AccessKey: "aws-access-key",
+				SecretKey: "AWS_SECRET_KEY_$$",
+				Endpoint:  "s3.aws.com",
+				Region:    "us-east",
+			},
+		},
+	}
+
+	credResp, err := credClient.Create(context.Background(), credReq)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
+	return credResp.GetCredentialId()
+}
+
+// This will create credential for provider listed from cb.yaml file
+func parseAndCreateCredentials2(credClient api.OpenStorageCredentialsClient) map[string]string {
+	credMap := make(map[string]string)
+	for provider, providerParams := range config.ProviderConfig.CloudProviders {
+		if provider == "aws" {
+
+			credReq := &api.SdkCredentialCreateRequest{
+				CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
+					AwsCredential: &api.SdkAwsCredentialRequest{
+						AccessKey: providerParams["CredAccessKey"],
+						SecretKey: providerParams["CredSecretKey"],
+						Endpoint:  providerParams["CredEndpoint"],
+						Region:    providerParams["CredRegion"],
+					},
+				},
+			}
+
+			credResp, err := credClient.Create(context.Background(), credReq)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
+			credMap["aws"] = credResp.GetCredentialId()
+
+		} else if provider == "azure" {
+			credReq := &api.SdkCredentialCreateRequest{
+				CredentialType: &api.SdkCredentialCreateRequest_AzureCredential{
+					AzureCredential: &api.SdkAzureCredentialRequest{
+						AccountKey:  providerParams["CredAccountName"],
+						AccountName: providerParams["CredAccountKey"],
+					},
+				},
+			}
+			credResp, err := credClient.Create(context.Background(), credReq)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
+			credMap["azure"] = credResp.GetCredentialId()
+
+		} else if provider == "google" {
+			credReq := &api.SdkCredentialCreateRequest{
+				CredentialType: &api.SdkCredentialCreateRequest_GoogleCredential{
+					GoogleCredential: &api.SdkGoogleCredentialRequest{
+						ProjectId: providerParams["CredProjectID"],
+						JsonKey:   providerParams["CredJsonKey"],
+					},
+				},
+			}
+
+			credResp, err := credClient.Create(context.Background(), credReq)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
+			credMap["google"] = credResp.GetCredentialId()
+		}
+	}
+	return credMap
+}

@@ -1,8 +1,8 @@
 cloudproviders:
-  azure:
-    CredType: "azure"
-    CredAccountName: "Account_Name"
-    CredAccountKey: "Secret_Key"
+#  azure:
+#    CredType: "azure"
+#    CredAccountName: "Account_Name"
+#    CredAccountKey: "Secret_Key"
   aws:
     CredType: "aws"
     CredRegion: "Region_value"
@@ -10,8 +10,8 @@ cloudproviders:
     CredEndpoint: "endpoint"
     CredSecretKey: "Secret_Key"
     CredDisableSSL: "DisableSSL"
-  google:
-    CredType: "google"
-    CredProjectID: "Project_ID"
-    CredJsonKey: "JSON_Key"
+#  google:
+#    CredType: "google"
+#    CredProjectID: "Project_ID"
+#    CredJsonKey: "JSON_Key"
 
