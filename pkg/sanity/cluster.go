@@ -25,6 +25,8 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/libopenstorage/openstorage/api"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,6 +36,7 @@ var _ = Describe("Enumerate [OpenStorageCluster]", func() {
 	var (
 		c api.OpenStorageClusterClient
 		v api.OpenStorageVolumeClient
+		n api.OpenStorageNodeClient
 
 		volID            string
 		numVolumesBefore int
@@ -43,6 +46,7 @@ var _ = Describe("Enumerate [OpenStorageCluster]", func() {
 	BeforeEach(func() {
 		c = api.NewOpenStorageClusterClient(conn)
 		v = api.NewOpenStorageVolumeClient(conn)
+		n = api.NewOpenStorageNodeClient(conn)
 
 		numVolumesBefore = numberOfVolumesInCluster(v)
 		volID = ""
@@ -231,6 +235,90 @@ var _ = Describe("Enumerate [OpenStorageCluster]", func() {
 				//Expect(noOfOccurence).To(BeEquivalentTo(0))
 			*/
 		})
+	})
 
+	Describe("Node Enumerate", func() {
+
+		It("Should successfully enumerate nodes", func() {
+
+			enumResp, err := n.Enumerate(
+				context.Background(),
+				&api.SdkNodeEnumerateRequest{},
+			)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(enumResp.NodeIds).NotTo(BeEmpty())
+		})
+	})
+
+	Describe("Node Inspect", func() {
+
+		It("Should inspect all the nodes Successfully", func() {
+			By("Enumerating the nodes and getting the node id")
+			enumResp, err := n.Enumerate(
+				context.Background(),
+				&api.SdkNodeEnumerateRequest{},
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(enumResp.NodeIds).NotTo(BeEmpty())
+
+			for _, nodeID := range enumResp.NodeIds {
+
+				inspectResp, err := n.Inspect(
+					context.Background(),
+					&api.SdkNodeInspectRequest{
+						NodeId: nodeID,
+					},
+				)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(inspectResp).NotTo(BeNil())
+				Expect(inspectResp.Node.Id).To(BeEquivalentTo(nodeID))
+			}
+		})
+
+		It("Should fail to inspect a a non-existent node id", func() {
+
+			inspectResp, err := n.Inspect(
+				context.Background(),
+				&api.SdkNodeInspectRequest{
+					NodeId: "node-id-doesnt-exist",
+				},
+			)
+			Expect(err).To(HaveOccurred())
+			Expect(inspectResp).To(BeNil())
+
+			serverError, ok := status.FromError(err)
+			Expect(ok).To(BeTrue())
+			Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
+		})
+
+		It("Should fail to inspect an empty node id", func() {
+			inspectResp, err := n.Inspect(
+				context.Background(),
+				&api.SdkNodeInspectRequest{
+					NodeId: "",
+				},
+			)
+			Expect(err).To(HaveOccurred())
+			Expect(inspectResp).To(BeNil())
+
+			serverError, ok := status.FromError(err)
+			Expect(ok).To(BeTrue())
+			Expect(serverError.Code()).To(BeEquivalentTo(codes.InvalidArgument))
+		})
+	})
+
+	Describe("Node InspectCurrent", func() {
+		It("Should inspect the current node successfully", func() {
+			resp, err := n.InspectCurrent(
+				context.Background(),
+				&api.SdkNodeInspectCurrentRequest{},
+			)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp).NotTo(BeNil())
+			Expect(resp.Node.Id).NotTo(BeNil())
+		})
 	})
 })
