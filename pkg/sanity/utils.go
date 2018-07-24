@@ -127,15 +127,12 @@ func newTestVolume(volClient api.OpenStorageVolumeClient) string {
 	volReq := &api.SdkVolumeCreateRequest{
 		Name: "sdk-vol",
 		Spec: &api.VolumeSpec{
-			Size:             uint64(5 * GIGABYTE),
-			AggregationLevel: 2,
-			Encrypted:        true,
-			Shared:           false,
-			HaLevel:          3,
-			IoProfile:        api.IoProfile_IO_PROFILE_DB,
-			Cos:              api.CosType_HIGH,
-			Sticky:           true,
-			Format:           api.FSType_FS_TYPE_XFS,
+			Size:      uint64(5 * GIGABYTE),
+			Shared:    false,
+			HaLevel:   3,
+			IoProfile: api.IoProfile_IO_PROFILE_DB,
+			Cos:       api.CosType_HIGH,
+			Format:    api.FSType_FS_TYPE_XFS,
 		},
 	}
 	volResp, err := volClient.Create(context.Background(), volReq)
