@@ -38,9 +38,9 @@ ignored = ["github.com/Sirupsen/logrus*"]
   name = "github.com/onsi/gomega"
   version = "1.4.0"
 
-[[constraint]]
-  branch = "master"
-  name = "golang.org/x/net"
+#[[override]]
+#  branch = "master"
+#  name = "golang.org/x/net"
 
 [[constraint]]
   name = "google.golang.org/grpc"
