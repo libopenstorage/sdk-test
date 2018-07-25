@@ -2,13 +2,21 @@ package sanity
 
 import (
 	"context"
+	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/libopenstorage/openstorage/api"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+func genSnapName(volid string) string {
+	return fmt.Sprintf("%s-snap-%v",
+		volid,
+		time.Now().Unix())
+}
 
 var _ = Describe("Volume [OpenStorageVolume]", func() {
 	var (
@@ -87,6 +95,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			vreq := &api.SdkVolumeSnapshotCreateRequest{
 				VolumeId: vResp.VolumeId,
+				Name:     genSnapName(vResp.VolumeId),
 				Labels: map[string]string{
 					"Name": "snapshot-of" + volID,
 				},
@@ -180,6 +189,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 				snapReq := &api.SdkVolumeSnapshotCreateRequest{
 					VolumeId: vResp.VolumeId,
+					Name:     genSnapName(vResp.VolumeId),
 					Labels: map[string]string{
 						"Name": "snapshot-" + strconv.Itoa(i) + "-of" + volID,
 					},
@@ -271,6 +281,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			snapReq := &api.SdkVolumeSnapshotCreateRequest{
 				VolumeId: volID,
+				Name:     genSnapName(volID),
 				Labels: map[string]string{
 					"Name": "snapshot-of" + volID,
 				},
