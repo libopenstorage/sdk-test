@@ -667,13 +667,15 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			volID         string
 			volumesBefore int
 			volumesAfter  int
-			mountPath     string
 		)
 
 		BeforeEach(func() {
 			volumesBefore = numberOfVolumesInCluster(c)
-			mountPath = "/mnt"
 			volID = ""
+
+			if len(config.MountPath) == 0 {
+				Skip("Mount path was not provided")
+			}
 		})
 
 		AfterEach(func() {
@@ -684,7 +686,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					context.Background(),
 					&api.SdkVolumeUnmountRequest{
 						VolumeId:  volID,
-						MountPath: mountPath,
+						MountPath: config.MountPath,
 					},
 				)
 				Expect(err).NotTo(HaveOccurred())
@@ -746,7 +748,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				context.Background(),
 				&api.SdkVolumeMountRequest{
 					VolumeId:  volID,
-					MountPath: mountPath,
+					MountPath: config.MountPath,
 				},
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -791,7 +793,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 		context.Background(),
 		// 		&api.SdkVolumeMountRequest{
 		// 			VolumeId:  volID,
-		// 			MountPath: mountPath,
+		// 			MountPath: config.MountPath,
 		// 		},
 		// 	)
 		// 	Expect(err).To(HaveOccurred())
@@ -811,7 +813,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 		context.Background(),
 		// 		&api.SdkVolumeMountRequest{
 		// 			VolumeId:  "dummy-doesnt-exist",
-		// 			MountPath: mountPath,
+		// 			MountPath: config.MountPath,
 		// 		},
 		// 	)
 		// 	Expect(err).To(HaveOccurred())
@@ -828,7 +830,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				context.Background(),
 				&api.SdkVolumeMountRequest{
 					VolumeId:  "",
-					MountPath: mountPath,
+					MountPath: config.MountPath,
 				},
 			)
 			Expect(err).To(HaveOccurred())
