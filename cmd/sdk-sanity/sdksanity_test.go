@@ -58,7 +58,6 @@ func TestSanity(t *testing.T) {
 
 	if len(cloudProviderConfigPath) == 0 {
 		t.Logf("No Cloud provider config file provided , Cloud related Tests will be skipped")
-		cfg = &sanity.CloudProviderConfig{}
 	}
 
 	if len(cloudProviderConfigPath) != 0 {

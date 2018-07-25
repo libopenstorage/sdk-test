@@ -713,8 +713,11 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			req := &api.SdkVolumeCreateRequest{
 				Name: "mount-vol",
 				Spec: &api.VolumeSpec{
-					Size:    uint64(5 * GIGABYTE),
-					HaLevel: 3,
+					Size:      uint64(5 * GIGABYTE),
+					HaLevel:   3,
+					IoProfile: api.IoProfile_IO_PROFILE_DB,
+					Cos:       api.CosType_HIGH,
+					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
 			createResponse, err := c.Create(context.Background(), req)
