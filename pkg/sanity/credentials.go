@@ -79,6 +79,10 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 				}
 			}
 
+			if len(credID) == 0 {
+				Skip("No provider given, skipping tests. Currently only aws provider is supported")
+			}
+
 			inspectReq := &api.SdkCredentialInspectRequest{CredentialId: credID}
 			inspectResp, err := credClient.Inspect(context.Background(), inspectReq)
 			Expect(err).NotTo(HaveOccurred())
