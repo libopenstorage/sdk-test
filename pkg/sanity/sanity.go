@@ -47,6 +47,7 @@ type CloudProviderConfig struct {
 
 type SanityConfiguration struct {
 	Address        string
+	MountPath      string
 	ProviderConfig *CloudProviderConfig
 }
 

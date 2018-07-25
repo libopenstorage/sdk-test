@@ -32,12 +32,14 @@ const (
 var (
 	VERSION                 = "(dev)"
 	endpoint                string
+	mountpath               string
 	version                 bool
 	cloudProviderConfigPath string
 )
 
 func init() {
 	flag.StringVar(&endpoint, prefix+"endpoint", "", "OpenStorage SDK endpoint")
+	flag.StringVar(&mountpath, prefix+"mountpath", "", "Mount path for volumes")
 	flag.BoolVar(&version, prefix+"version", false, "Version of this program")
 	flag.StringVar(&cloudProviderConfigPath, prefix+"cpg", "", "Cloud Provider config file , optional")
 	flag.Parse()
@@ -68,6 +70,7 @@ func TestSanity(t *testing.T) {
 	}
 	sanity.Test(t, &sanity.SanityConfiguration{
 		Address:        endpoint,
+		MountPath:      mountpath,
 		ProviderConfig: cfg,
 	})
 }
