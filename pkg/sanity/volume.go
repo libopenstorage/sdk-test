@@ -950,5 +950,125 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 		Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
 		// 	})
 	})
+	Describe("Volume stats", func() {
+		var (
+			volID         string
+			volumesBefore int
+			volumesAfter  int
+		)
 
+		BeforeEach(func() {
+			volumesBefore = numberOfVolumesInCluster(c)
+			volID = ""
+		})
+
+		AfterEach(func() {
+			if volID != "" {
+				_, err := c.Delete(
+					context.Background(),
+					&api.SdkVolumeDeleteRequest{VolumeId: volID},
+				)
+				Expect(err).NotTo(HaveOccurred())
+			}
+		})
+
+		It("Should retrieve stats of volume successfully", func() {
+			By("Creating the volume first")
+			req := &api.SdkVolumeCreateRequest{
+				Name: "mount-vol",
+				Spec: &api.VolumeSpec{
+					Size:      uint64(5 * GIGABYTE),
+					HaLevel:   3,
+					IoProfile: api.IoProfile_IO_PROFILE_DB,
+					Cos:       api.CosType_HIGH,
+					Format:    api.FSType_FS_TYPE_XFS,
+				},
+			}
+			createResponse, err := c.Create(context.Background(), req)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(createResponse).NotTo(BeNil())
+			Expect(createResponse.VolumeId).NotTo(BeEmpty())
+			volID = createResponse.VolumeId
+
+			volumesAfter = numberOfVolumesInCluster(c)
+			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
+
+			statsResp, err := c.Stats(
+				context.Background(),
+				&api.SdkVolumeStatsRequest{
+					VolumeId:      volID,
+					NotCumulative: true,
+				},
+			)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(statsResp.Stats).NotTo(BeNil())
+		})
+
+		It("Should retrieve stats of volume successfully for  cumulative", func() {
+			By("Creating the volume first")
+			req := &api.SdkVolumeCreateRequest{
+				Name: "stats-vol",
+				Spec: &api.VolumeSpec{
+					Size:      uint64(5 * GIGABYTE),
+					HaLevel:   3,
+					IoProfile: api.IoProfile_IO_PROFILE_DB,
+					Cos:       api.CosType_HIGH,
+					Format:    api.FSType_FS_TYPE_XFS,
+				},
+			}
+			createResponse, err := c.Create(context.Background(), req)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(createResponse).NotTo(BeNil())
+			Expect(createResponse.VolumeId).NotTo(BeEmpty())
+			volID = createResponse.VolumeId
+
+			volumesAfter = numberOfVolumesInCluster(c)
+			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
+
+			statsResp, err := c.Stats(
+				context.Background(),
+				&api.SdkVolumeStatsRequest{
+					VolumeId:      volID,
+					NotCumulative: false,
+				},
+			)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(statsResp.Stats).NotTo(BeNil())
+		})
+
+		It("Should fail to retrieve stats of non-existent volume", func() {
+
+			statsResp, err := c.Stats(
+				context.Background(),
+				&api.SdkVolumeStatsRequest{
+					VolumeId:      "volID-doesnt-exist",
+					NotCumulative: true,
+				},
+			)
+
+			Expect(err).To(HaveOccurred())
+			Expect(statsResp).To(BeNil())
+			serverError, ok := status.FromError(err)
+			Expect(ok).To(BeTrue())
+			Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
+		})
+
+		It("Should fail to retrieve stats of empty volume", func() {
+			statsResp, err := c.Stats(
+				context.Background(),
+				&api.SdkVolumeStatsRequest{
+					VolumeId:      volID,
+					NotCumulative: true,
+				},
+			)
+
+			Expect(err).To(HaveOccurred())
+			Expect(statsResp).To(BeNil())
+			serverError, ok := status.FromError(err)
+			Expect(ok).To(BeTrue())
+			Expect(serverError.Code()).To(BeEquivalentTo(codes.InvalidArgument))
+		})
+	})
 })
