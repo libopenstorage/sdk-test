@@ -45,11 +45,22 @@ func numberOfSchedulePoliciesInCluster(c api.OpenStorageSchedulePolicyClient) in
 
 var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 	var (
-		c api.OpenStorageSchedulePolicyClient
+		c  api.OpenStorageSchedulePolicyClient
+		ic api.OpenStorageIdentityClient
 	)
 
 	BeforeEach(func() {
 		c = api.NewOpenStorageSchedulePolicyClient(conn)
+		ic = api.NewOpenStorageIdentityClient(conn)
+
+		isSupported := isCapabilitySupported(
+			ic,
+			api.SdkServiceCapability_OpenStorageService_SCHEDULE_POLICY,
+		)
+
+		if !isSupported {
+			Skip("Schedule Policy capability not supported , skipping related tests")
+		}
 	})
 
 	Describe("Create", func() {

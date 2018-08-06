@@ -239,7 +239,7 @@
     "volume/drivers/pwx",
     "volume/drivers/vfs"
   ]
-  revision = "6e902ec1796498f18395113200dfe4ab30d6dfa1"
+  revision = "0157eb3ce2b6e9957145def058405b78bda15a69"
 
 [[projects]]
   branch = "master"
