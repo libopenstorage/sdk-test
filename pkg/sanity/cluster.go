@@ -17,9 +17,6 @@ limitations under the License.
 package sanity
 
 import (
-	//"google.golang.org/grpc/codes"
-	//"google.golang.org/grpc/status"
-
 	"context"
 	"time"
 
@@ -32,11 +29,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Enumerate [OpenStorageCluster]", func() {
+var _ = Describe("Cluster [OpenStorageCluster]", func() {
 	var (
-		c api.OpenStorageClusterClient
-		v api.OpenStorageVolumeClient
-		n api.OpenStorageNodeClient
+		c  api.OpenStorageClusterClient
+		v  api.OpenStorageVolumeClient
+		n  api.OpenStorageNodeClient
+		ic api.OpenStorageIdentityClient
 
 		volID            string
 		numVolumesBefore int
@@ -47,6 +45,16 @@ var _ = Describe("Enumerate [OpenStorageCluster]", func() {
 		c = api.NewOpenStorageClusterClient(conn)
 		v = api.NewOpenStorageVolumeClient(conn)
 		n = api.NewOpenStorageNodeClient(conn)
+		ic = api.NewOpenStorageIdentityClient(conn)
+
+		isSupported := isCapabilitySupported(
+			ic,
+			api.SdkServiceCapability_OpenStorageService_CLUSTER,
+		)
+
+		if !isSupported {
+			Skip("Cluster capability not supported , skipping related tests")
+		}
 
 		numVolumesBefore = numberOfVolumesInCluster(v)
 		volID = ""

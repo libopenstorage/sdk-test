@@ -33,11 +33,22 @@ import (
 
 var _ = Describe("Volume [OpenStorageVolume]", func() {
 	var (
-		c api.OpenStorageVolumeClient
+		c  api.OpenStorageVolumeClient
+		ic api.OpenStorageIdentityClient
 	)
 
 	BeforeEach(func() {
 		c = api.NewOpenStorageVolumeClient(conn)
+		ic = api.NewOpenStorageIdentityClient(conn)
+
+		isSupported := isCapabilitySupported(
+			ic,
+			api.SdkServiceCapability_OpenStorageService_VOLUME,
+		)
+
+		if !isSupported {
+			Skip("Volume capability not supported , skipping related tests")
+		}
 	})
 
 	Describe("Volume Create", func() {

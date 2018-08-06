@@ -1,3 +1,19 @@
+/*
+Copyright 2018 Portworx
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package sanity
 
 import (
@@ -14,9 +30,21 @@ import (
 var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 	var (
 		credClient api.OpenStorageCredentialsClient
+		ic         api.OpenStorageIdentityClient
 	)
 
 	BeforeEach(func() {
+
+		ic = api.NewOpenStorageIdentityClient(conn)
+
+		isSupported := isCapabilitySupported(
+			ic,
+			api.SdkServiceCapability_OpenStorageService_CREDENTIALS,
+		)
+
+		if !isSupported {
+			Skip("Credentials capability not supported , skipping related tests")
+		}
 
 		credClient = api.NewOpenStorageCredentialsClient(conn)
 		if config.ProviderConfig == nil {
