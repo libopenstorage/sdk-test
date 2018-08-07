@@ -1,4 +1,4 @@
-APP_NAME := sdk-sanity
+APP_NAME := sdk-test
 # $(shell git describe)
 BRANCH := $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
 SHA := $(shell git rev-parse --short HEAD)
@@ -17,19 +17,19 @@ else
 endif
 endif
 
-LDFLAGS :=-ldflags "-w -X github.com/libopenstorage/sdk-test/cmd/sdksanity.VERSION=$(VERSION) -extldflags '-z relro -z now'"
+LDFLAGS :=-ldflags "-w -X github.com/libopenstorage/sdk-test/cmd/sdk.VERSION=$(VERSION) -extldflags '-z relro -z now'"
 PACKAGE :=$(DIR)/dist/$(APP_NAME)-$(VERSION).$(GOOS).$(ARCH).tar.gz
 
-all: $(APP_NAME)
+all: app
 
-install: $(APP_NAME)
+install: app
 	cp $(APP_NAME) $(GOPATH)/bin
 
-$(APP_NAME): Makefile sdksanity_test.go
+app:
 	go test $(LDFLAGS) -c -o $(APP_NAME)
 
 clean:
-	rm -f sdk-sanity
+	rm -f sdk-test
 	rm -rf $(DIR)/dist
 
 dist: $(PACKAGE)
