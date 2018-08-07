@@ -36,7 +36,33 @@ var _ = Describe("Identity Service", func() {
 		c = api.NewOpenStorageIdentityClient(conn)
 	})
 
-	Describe("GetPluginCapabilities", func() {
+	Describe("Version", func() {
+		It("should return version information", func() {
+			res, err := c.Version(context.Background(), &api.SdkIdentityVersionRequest{})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res).NotTo(BeNil())
+			Expect(res.GetSdkVersion()).NotTo(BeNil())
+			Expect(res.GetSdkVersion().GetVersion()).NotTo(BeEmpty())
+			Expect(res.GetVersion()).NotTo(BeNil())
+
+			By("Checking SDK version")
+			Expect(res.GetSdkVersion().GetMajor()).To(BeNumerically(">=", 0))
+			Expect(res.GetSdkVersion().GetMinor()).To(BeNumerically(">=", 0))
+			Expect(res.GetSdkVersion().GetPatch()).To(BeNumerically(">=", 0))
+
+			expectVersion := fmt.Sprintf("%d.%d.%d",
+				res.GetSdkVersion().GetMajor(),
+				res.GetSdkVersion().GetMinor(),
+				res.GetSdkVersion().GetPatch())
+			Expect(res.GetSdkVersion().GetVersion()).To(Equal(expectVersion))
+
+			By("Checking driver version")
+			Expect(res.GetVersion().GetDriver()).NotTo(BeEmpty())
+			Expect(res.GetVersion().GetVersion()).NotTo(BeEmpty())
+		})
+	})
+
+	Describe("Capabilities", func() {
 		It("should return appropriate capabilities", func() {
 			req := &api.SdkIdentityCapabilitiesRequest{}
 			res, err := c.Capabilities(context.Background(), req)
