@@ -1,6 +1,6 @@
 # Gopkg.toml example
 #
-# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
 # for detailed Gopkg.toml documentation.
 #
 # required = ["github.com/user/thing/cmd/thing"]
@@ -24,31 +24,30 @@
 #   go-tests = true
 #   unused-packages = true
 
-ignored = ["github.com/Sirupsen/logrus*"]
 
 [[constraint]]
-  name = "github.com/libopenstorage/openstorage"
+  name = "github.com/golang/protobuf"
+  version = "1.1.0"
+
+[[constraint]]
   branch = "master"
+  name = "github.com/libopenstorage/openstorage-sdk-clients"
 
 [[constraint]]
   name = "github.com/onsi/ginkgo"
-  version = "1.5.0"
+  version = "1.6.0"
 
 [[constraint]]
   name = "github.com/onsi/gomega"
-  version = "1.4.0"
-
-#[[override]]
-#  branch = "master"
-#  name = "golang.org/x/net"
+  version = "1.4.1"
 
 [[constraint]]
   name = "google.golang.org/grpc"
-  version = "1.13.0"
+  version = "1.14.0"
 
-[[override]]
-  name = "github.com/docker/docker"
-  revision = "4a7bd7eaef0038b006cf23adface84081e5aab3b"
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.2.1"
 
 [prune]
   go-tests = true

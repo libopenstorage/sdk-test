@@ -4,6 +4,7 @@ cloudproviders:
 #    CredAccountName: "Account_Name"
 #    CredAccountKey: "Secret_Key"
   aws:
+    CredName: "aws-name"
     CredType: "aws"
     CredRegion: "Region_value"
     CredAccessKey: "Access_Key"

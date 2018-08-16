@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/libopenstorage/openstorage/api"
+	api "github.com/libopenstorage/openstorage-sdk-clients/sdk/golang"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
