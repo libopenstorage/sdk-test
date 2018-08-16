@@ -19,7 +19,7 @@ package sanity
 import (
 	"context"
 
-	"github.com/libopenstorage/openstorage/api"
+	api "github.com/libopenstorage/openstorage-sdk-clients/sdk/golang"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -81,11 +81,13 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 			credID := ""
 			accessKey := ""
 			region := ""
+			name := ""
 
 			// Create credential from cb.yaml
 			for provider, providerParams := range config.ProviderConfig.CloudProviders {
 				if provider == "aws" {
 					credReq := &api.SdkCredentialCreateRequest{
+						Name: providerParams["CredName"],
 						CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
 							AwsCredential: &api.SdkAwsCredentialRequest{
 								AccessKey: providerParams["CredAccessKey"],
@@ -102,6 +104,7 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 					Expect(credID).NotTo(BeEmpty())
 					accessKey = credReq.GetAwsCredential().GetAccessKey()
 					region = credReq.GetAwsCredential().GetRegion()
+					name = credReq.GetName()
 
 					break
 				}
@@ -114,6 +117,7 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 			inspectReq := &api.SdkCredentialInspectRequest{CredentialId: credID}
 			inspectResp, err := credClient.Inspect(context.Background(), inspectReq)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(inspectResp.GetName()).To(Equal(name))
 			Expect(inspectResp.GetAwsCredential().GetAccessKey()).To(BeEquivalentTo(accessKey))
 			Expect(inspectResp.GetAwsCredential().GetRegion()).To(BeEquivalentTo(region))
 		})

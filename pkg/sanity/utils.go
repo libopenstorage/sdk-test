@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/libopenstorage/openstorage/api"
+	api "github.com/libopenstorage/openstorage-sdk-clients/sdk/golang"
 	. "github.com/onsi/gomega"
 )
 
@@ -93,6 +93,7 @@ func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int 
 	for provider, providerParams := range config.ProviderConfig.CloudProviders {
 		if provider == "aws" {
 			credReq := &api.SdkCredentialCreateRequest{
+				Name: providerParams["CredName"],
 				CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
 					AwsCredential: &api.SdkAwsCredentialRequest{
 						AccessKey: providerParams["CredAccessKey"],
@@ -110,6 +111,7 @@ func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int 
 
 		} else if provider == "azure" {
 			credReq := &api.SdkCredentialCreateRequest{
+				Name: providerParams["CredName"],
 				CredentialType: &api.SdkCredentialCreateRequest_AzureCredential{
 					AzureCredential: &api.SdkAzureCredentialRequest{
 						AccountKey:  providerParams["CredAccountName"],
@@ -125,6 +127,7 @@ func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int 
 
 		} else if provider == "google" {
 			credReq := &api.SdkCredentialCreateRequest{
+				Name: providerParams["CredName"],
 				CredentialType: &api.SdkCredentialCreateRequest_GoogleCredential{
 					GoogleCredential: &api.SdkGoogleCredentialRequest{
 						ProjectId: providerParams["CredProjectID"],
@@ -164,6 +167,7 @@ func newTestVolume(volClient api.OpenStorageVolumeClient) string {
 
 func newTestCredential(credClient api.OpenStorageCredentialsClient) string {
 	credReq := &api.SdkCredentialCreateRequest{
+		Name: "test-credential",
 		CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
 			AwsCredential: &api.SdkAwsCredentialRequest{
 				AccessKey: "aws-access-key",
@@ -187,6 +191,7 @@ func parseAndCreateCredentials2(credClient api.OpenStorageCredentialsClient) map
 		if provider == "aws" {
 
 			credReq := &api.SdkCredentialCreateRequest{
+				Name: providerParams["CredName"],
 				CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
 					AwsCredential: &api.SdkAwsCredentialRequest{
 						AccessKey: providerParams["CredAccessKey"],
@@ -204,6 +209,7 @@ func parseAndCreateCredentials2(credClient api.OpenStorageCredentialsClient) map
 
 		} else if provider == "azure" {
 			credReq := &api.SdkCredentialCreateRequest{
+				Name: providerParams["CredName"],
 				CredentialType: &api.SdkCredentialCreateRequest_AzureCredential{
 					AzureCredential: &api.SdkAzureCredentialRequest{
 						AccountKey:  providerParams["CredAccountName"],
@@ -218,6 +224,7 @@ func parseAndCreateCredentials2(credClient api.OpenStorageCredentialsClient) map
 
 		} else if provider == "google" {
 			credReq := &api.SdkCredentialCreateRequest{
+				Name: providerParams["CredName"],
 				CredentialType: &api.SdkCredentialCreateRequest_GoogleCredential{
 					GoogleCredential: &api.SdkGoogleCredentialRequest{
 						ProjectId: providerParams["CredProjectID"],
