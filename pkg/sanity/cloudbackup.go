@@ -393,10 +393,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					CredentialId: credID,
 				}
 
-				enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(enumerateResp).ToNot(BeNil())
-				Expect(enumerateResp.GetBackups()).To(HaveLen(0))
+				_, err := bc.Enumerate(context.Background(), enumerateReq)
+				Expect(err).To(HaveOccurred())
 			}
 		})
 
