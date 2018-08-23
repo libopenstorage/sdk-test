@@ -36,9 +36,7 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 		n  api.OpenStorageNodeClient
 		ic api.OpenStorageIdentityClient
 
-		volID            string
-		numVolumesBefore int
-		numVolumesAfter  int
+		volID string
 	)
 
 	BeforeEach(func() {
@@ -56,7 +54,6 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 			Skip("Cluster capability not supported , skipping related tests")
 		}
 
-		numVolumesBefore = numberOfVolumesInCluster(v)
 		volID = ""
 	})
 
@@ -98,10 +95,6 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 
 			vResp, err := v.Create(context.Background(), req)
 			Expect(err).NotTo(HaveOccurred())
-
-			// Test if no. of volumes increased by 1
-			numVolumesAfter = numberOfVolumesInCluster(v)
-			Expect(numVolumesAfter).To(BeEquivalentTo(numVolumesBefore + 1))
 
 			// Test Volume Details by Calling Volume Inspect
 			inspectReq := &api.SdkVolumeInspectRequest{

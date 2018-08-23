@@ -28,6 +28,30 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func getBackupId(bc api.OpenStorageCloudBackupClient, clusterId, volumeId, credentialId string) string {
+
+	enumerateReq := &api.SdkCloudBackupEnumerateRequest{
+		ClusterId:    clusterId,
+		SrcVolumeId:  volumeId,
+		CredentialId: credentialId,
+	}
+	enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(enumerateResp).NotTo(BeNil())
+	Expect(enumerateResp.GetBackups()).NotTo(BeEmpty())
+
+	var backupId string
+	for _, backup := range enumerateResp.GetBackups() {
+		if backup.GetSrcVolumeId() == volumeId {
+			backupId = backup.GetId()
+			break
+		}
+	}
+	Expect(backupId).NotTo(BeEmpty())
+
+	return backupId
+}
+
 var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 	var (
 		cc api.OpenStorageCredentialsClient
@@ -370,12 +394,9 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				}
 
 				enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
-				Expect(err).To(HaveOccurred())
-				Expect(enumerateResp).To(BeNil())
-
-				serverError, ok := status.FromError(err)
-				Expect(ok).To(BeTrue())
-				Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(enumerateResp).ToNot(BeNil())
+				Expect(enumerateResp.GetBackups()).To(HaveLen(0))
 			}
 		})
 
@@ -494,7 +515,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			for provider, uuid := range credsUUIDMap {
 				credID = uuid
 
-				By("Attaching the created volume")
+				By("attaching the created volume")
 				str, err := vc.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
@@ -504,7 +525,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(str).NotTo(BeNil())
 
-				By("Doing Backup on " + provider)
+				By("doing Backup on " + provider)
 
 				backupReq := &api.SdkCloudBackupCreateRequest{
 					VolumeId:     volID,
@@ -529,34 +550,20 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone {
 						break
-					}
-					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeActive {
+					} else if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeFailed {
+						break
+					} else {
 						time.Sleep(time.Second * 10)
 						timeout += 10
-					}
-					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeFailed {
-						break
 					}
 				}
 				Expect(bkpStatus.Status).To(BeEquivalentTo(api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone))
 
-				By("Doing cloudbakup enumerate")
-				enumerateReq := &api.SdkCloudBackupEnumerateRequest{
-					ClusterId:    clusterID,
-					SrcVolumeId:  volID,
-					CredentialId: credID,
-				}
-
-				enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(enumerateResp).NotTo(BeNil())
-
-				backupID := enumerateResp.Backups[0].Id
-
+				By("checking the catalog")
 				catalogResp, err := bc.Catalog(
 					context.Background(),
 					&api.SdkCloudBackupCatalogRequest{
-						BackupId:     backupID,
+						BackupId:     getBackupId(bc, clusterID, volID, credID),
 						CredentialId: credID,
 					},
 				)
@@ -709,16 +716,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					SrcVolumeId: volID,
 				},
 			)
-
-			isPresent := false
-			for _, historyItem := range historyResp.HistoryList {
-				if historyItem.SrcVolumeId == volID {
-					//Expect(historyItem.Status).To(ContainSubstring("Cloudsnap Backup completed successfully"))
-					Expect(historyItem.Status).To(BeEquivalentTo(api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone))
-					isPresent = true
-				}
-			}
-			Expect(isPresent).To(BeTrue())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(historyResp.GetHistoryList()).NotTo(BeEmpty())
 		})
 
 		// TODO Fake driver to return error code 13  but instead returns 3
@@ -830,24 +829,11 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				}
 				Expect(bkpStatus.Status).To(BeEquivalentTo(api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone))
 
-				By("Doing cloudbackup enumerate")
-				enumerateReq := &api.SdkCloudBackupEnumerateRequest{
-					ClusterId:    clusterID,
-					SrcVolumeId:  volID,
-					CredentialId: credID,
-				}
-
-				enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(enumerateResp).NotTo(BeNil())
-
-				backupID := enumerateResp.Backups[0].Id
-
 				By("Doing restore of the cloud backup")
 				restoreResp, err := bc.Restore(
 					context.Background(),
 					&api.SdkCloudBackupRestoreRequest{
-						BackupId:          backupID,
+						BackupId:          getBackupId(bc, clusterID, volID, credID),
 						CredentialId:      credID,
 						NodeId:            nodeID,
 						RestoreVolumeName: "restored-volume-" + volID,
@@ -941,23 +927,10 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				}
 				Expect(bkpStatus.Status).To(BeEquivalentTo(api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone))
 
-				By("Doing cloudbackup enumerate")
-				enumerateReq := &api.SdkCloudBackupEnumerateRequest{
-					ClusterId:    clusterID,
-					SrcVolumeId:  volID,
-					CredentialId: credID,
-				}
-
-				enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(enumerateResp).NotTo(BeNil())
-
-				backupID := enumerateResp.Backups[0].Id
-
 				_, err = bc.Delete(
 					context.Background(),
 					&api.SdkCloudBackupDeleteRequest{
-						BackupId:     backupID,
+						BackupId:     getBackupId(bc, clusterID, volID, credID),
 						CredentialId: credID,
 					},
 				)

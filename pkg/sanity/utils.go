@@ -77,16 +77,6 @@ func testVolumeCreation(req *api.SdkVolumeCreateRequest) {
 
 }
 
-func numberOfVolumesInCluster(c api.OpenStorageVolumeClient) int {
-	res, err := c.Enumerate(
-		context.Background(),
-		&api.SdkVolumeEnumerateRequest{},
-	)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(res).NotTo(BeNil())
-	return len(res.VolumeIds)
-}
-
 // This will create credential for provider listed from cb.yaml file
 func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int {
 	numCredCreated := 0

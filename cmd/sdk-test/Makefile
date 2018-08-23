@@ -1,8 +1,7 @@
 APP_NAME := sdk-test
-# $(shell git describe)
+VER := $(shell git describe)
 BRANCH := $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
 SHA := $(shell git rev-parse --short HEAD)
-VER :=0.1-$(SHA)
 ARCH := $(shell go env GOARCH)
 GOOS := $(shell go env GOOS)
 DIR=.
@@ -17,7 +16,7 @@ else
 endif
 endif
 
-LDFLAGS :=-ldflags "-w -X github.com/libopenstorage/sdk-test/cmd/sdk.VERSION=$(VERSION) -extldflags '-z relro -z now'"
+LDFLAGS :=-ldflags "-w -X github.com/libopenstorage/sdk-test/cmd/sdk-test.VERSION=$(VERSION) -extldflags '-z relro -z now'"
 PACKAGE :=$(DIR)/dist/$(APP_NAME)-$(VERSION).$(GOOS).$(ARCH).tar.gz
 
 all: app

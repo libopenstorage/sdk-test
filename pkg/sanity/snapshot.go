@@ -61,14 +61,11 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	Describe("Volume Snapshot Create", func() {
 
 		var (
-			numVolumesBefore int
-			numVolumesAfter  int
-			volID            string
-			snapID           string
+			volID  string
+			snapID string
 		)
 
 		BeforeEach(func() {
-			numVolumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 
@@ -114,8 +111,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			// Test the details of the created volume
 			testVolumeDetails(req, inspectResponse.Volume)
-			numVolumesAfter = numberOfVolumesInCluster(c)
-			Expect(numVolumesAfter).To(BeEquivalentTo(numVolumesBefore + 1))
 			volID = vResp.VolumeId
 
 			By("Creating a snapshot based on the created volume")
@@ -148,14 +143,11 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	Describe("Volume Snapshot Enumerate", func() {
 
 		var (
-			numVolumesBefore int
-			numVolumesAfter  int
-			volID            string
-			snapIDs          []string
+			volID   string
+			snapIDs []string
 		)
 
 		BeforeEach(func() {
-			numVolumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 
@@ -205,9 +197,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Checking if volume created successfully with the provided params")
 			testVolumeDetails(req, inspectResponse.Volume)
-			numVolumesAfter = numberOfVolumesInCluster(c)
-			Expect(numVolumesAfter).To(BeEquivalentTo(numVolumesBefore + 1))
-
 			By("Creating a multiple [3] snapshots based on the created volume")
 			volID = vResp.GetVolumeId()
 			numOfSnaps := 3
@@ -249,14 +238,11 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	Describe("Volume Snapshot Restore", func() {
 
 		var (
-			numVolumesBefore int
-			numVolumesAfter  int
-			volID            string
-			snapID           string
+			volID  string
+			snapID string
 		)
 
 		BeforeEach(func() {
-			numVolumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 
@@ -300,9 +286,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Checking if volume created successfully with the provided params")
 			testVolumeDetails(req, inspectResponse.Volume)
-
-			numVolumesAfter = numberOfVolumesInCluster(c)
-			Expect(numVolumesAfter).To(BeEquivalentTo(numVolumesBefore + 1))
 
 			By("Creating a snapshot based on the created volume")
 

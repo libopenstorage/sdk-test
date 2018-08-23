@@ -69,13 +69,12 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 			for _, uuid := range credsUUIDMap {
 				credID = uuid
 
-				_, err := cc.Delete(
+				cc.Delete(
 					context.Background(),
 					&api.SdkCredentialDeleteRequest{
 						CredentialId: credID,
 					},
 				)
-				Expect(err).NotTo(HaveOccurred())
 			}
 		}
 
@@ -145,6 +144,15 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(schedCreateResp.BackupScheduleId).NotTo(BeNil())
+
+				By("Deleting the schedule")
+				_, err = bc.SchedDelete(
+					context.Background(),
+					&api.SdkCloudBackupSchedDeleteRequest{
+						BackupScheduleId: schedCreateResp.BackupScheduleId,
+					},
+				)
+				Expect(err).NotTo(HaveOccurred())
 			}
 		})
 

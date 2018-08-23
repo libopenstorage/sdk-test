@@ -54,12 +54,9 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	Describe("Volume Create", func() {
 
 		var (
-			volumesBefore int
-			volumesAfter  int
-			volID         string
+			volID string
 		)
 		BeforeEach(func() {
-			volumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 
@@ -91,10 +88,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
-
-			// Test if no. of volumes increased by 1
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
 
 			// Test Volume Details by Calling Volume Inspect
 			inspectReq := &api.SdkVolumeInspectRequest{
@@ -172,12 +165,9 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	Describe("Volume Inspect", func() {
 
 		var (
-			volumesBefore int
-			volumesAfter  int
-			volID         string
+			volID string
 		)
 		BeforeEach(func() {
-			volumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 
@@ -206,9 +196,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
-
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
 
 			By("Inspecting the created volume")
 			resp, err := c.Inspect(
@@ -246,12 +233,9 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	Describe("Volume Delete", func() {
 
 		var (
-			volumesBefore int
-			volumesAfter  int
-			volID         string
+			volID string
 		)
 		BeforeEach(func() {
-			volumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 
@@ -271,9 +255,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
 
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
-
 			By("Deleting the created volume")
 			_, err = c.Delete(
 				context.Background(),
@@ -283,9 +264,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			)
 
 			Expect(err).NotTo(HaveOccurred())
-
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore))
 		})
 
 		// TODO: Fake driver should throw appropriate error message when fails
@@ -327,12 +305,9 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		var (
 			volIDs []string
-			//volumesBefore int
-			//volumesAfter  int
 		)
 
 		BeforeEach(func() {
-			//volumesBefore = numberOfVolumesInCluster(c)
 		})
 
 		AfterEach(func() {
@@ -386,9 +361,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 		volIDs = append(volIDs, id)
 		// 	}
 
-		// 	volumesAfter = numberOfVolumesInCluster(c)
-		// 	Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + (2 * numVolumes)))
-
 		// 	By("Enumerating the volumes that match the label")
 
 		// 	resp, err := c.Enumerate(
@@ -433,13 +405,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 	Describe("Volume Attach", func() {
 		var (
-			volID         string
-			volumesBefore int
-			volumesAfter  int
+			volID string
 		)
 
 		BeforeEach(func() {
-			volumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 
@@ -480,9 +449,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
-
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
 
 			By("Attaching the created Volume")
 
@@ -541,13 +507,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	Describe("Volume Detach", func() {
 
 		var (
-			volID         string
-			volumesBefore int
-			volumesAfter  int
+			volID string
 		)
 
 		BeforeEach(func() {
-			volumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 		AfterEach(func() {
@@ -575,9 +538,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
-
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
 
 			By("Attaching the created Volume")
 
@@ -620,9 +580,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	Expect(createResponse).NotTo(BeNil())
 		// 	Expect(createResponse.VolumeId).NotTo(BeEmpty())
 		// 	volID = createResponse.VolumeId
-
-		// 	volumesAfter = numberOfVolumesInCluster(c)
-		// 	Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
 
 		// 	By("Detaching a non-attached volume")
 
@@ -675,13 +632,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 	Describe("Volume Mount", func() {
 		var (
-			volID         string
-			volumesBefore int
-			volumesAfter  int
+			volID string
 		)
 
 		BeforeEach(func() {
-			volumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 
 			if len(config.MountPath) == 0 {
@@ -739,9 +693,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
 
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
-
 			By("Attaching the created Volume")
 
 			resp, err := c.Attach(
@@ -783,9 +734,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	Expect(createResponse).NotTo(BeNil())
 		// 	Expect(createResponse.VolumeId).NotTo(BeEmpty())
 		// 	volID = createResponse.VolumeId
-
-		// 	volumesAfter = numberOfVolumesInCluster(c)
-		// 	Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
 
 		// 	By("Attaching the created Volume")
 
@@ -853,14 +801,11 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 	Describe("Volume Clone", func() {
 		var (
-			volID         string
-			clonedID      string
-			volumesBefore int
-			volumesAfter  int
+			volID    string
+			clonedID string
 		)
 
 		BeforeEach(func() {
-			volumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 			clonedID = ""
 		})
@@ -898,9 +843,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
 
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
-
 			By("Cloning the volume")
 
 			cloneRespose, err := c.Clone(
@@ -936,9 +878,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 		Expect(createResponse.VolumeId).NotTo(BeEmpty())
 		// 		volID = createResponse.VolumeId
 
-		// 		volumesAfter = numberOfVolumesInCluster(c)
-		// 		Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
-
 		// 		By("Cloning the volume")
 
 		// 		cloneRespose, err := c.Clone(
@@ -963,13 +902,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	})
 	Describe("Volume stats", func() {
 		var (
-			volID         string
-			volumesBefore int
-			volumesAfter  int
+			volID string
 		)
 
 		BeforeEach(func() {
-			volumesBefore = numberOfVolumesInCluster(c)
 			volID = ""
 		})
 
@@ -1001,9 +937,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
 
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
-
 			statsResp, err := c.Stats(
 				context.Background(),
 				&api.SdkVolumeStatsRequest{
@@ -1034,9 +967,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
 
-			volumesAfter = numberOfVolumesInCluster(c)
-			Expect(volumesAfter).To(BeEquivalentTo(volumesBefore + 1))
-
 			statsResp, err := c.Stats(
 				context.Background(),
 				&api.SdkVolumeStatsRequest{
@@ -1050,6 +980,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 
 		It("Should fail to retrieve stats of non-existent volume", func() {
+			Skip("PWX-6056")
 
 			statsResp, err := c.Stats(
 				context.Background(),
@@ -1061,9 +992,6 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			Expect(err).To(HaveOccurred())
 			Expect(statsResp).To(BeNil())
-			serverError, ok := status.FromError(err)
-			Expect(ok).To(BeTrue())
-			Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
 		})
 
 		It("Should fail to retrieve stats of empty volume", func() {

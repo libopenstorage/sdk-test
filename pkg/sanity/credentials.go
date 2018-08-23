@@ -59,25 +59,30 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		for _, credID := range credEnumResp.GetCredentialIds() {
-			_, err = credClient.Delete(context.Background(), &api.SdkCredentialDeleteRequest{CredentialId: credID})
-			Expect(err).NotTo(HaveOccurred())
+			credClient.Delete(context.Background(), &api.SdkCredentialDeleteRequest{CredentialId: credID})
 		}
-
 	})
 
 	Describe("Credentials Create", func() {
 		It("Should Create Credentials", func() {
-
-			numCredCreated := parseAndCreateCredentials(credClient)
 			credEnumReq := &api.SdkCredentialEnumerateRequest{}
 			credEnumResp, err := credClient.Enumerate(context.Background(), credEnumReq)
 
+			By("checking what is there already")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(len(credEnumResp.GetCredentialIds())).To(Equal(numCredCreated))
+			numCreds := len(credEnumResp.GetCredentialIds())
+
+			By("creating new credentials")
+			numCredCreated := parseAndCreateCredentials(credClient)
+			credEnumResp, err = credClient.Enumerate(context.Background(), credEnumReq)
+
+			By("checking the new credentials were created")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(len(credEnumResp.GetCredentialIds())).To(Equal(numCredCreated + numCreds))
 
 		})
 
-		It("Should provide detail of given credential ID", func() {
+		It("Should provide detail,verify, and delete given credential ID", func() {
 			credID := ""
 			accessKey := ""
 			region := ""
@@ -98,6 +103,7 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 						},
 					}
 
+					By("creating credentials")
 					credResp, err := credClient.Create(context.Background(), credReq)
 					Expect(err).NotTo(HaveOccurred())
 					credID = credResp.GetCredentialId()
@@ -106,59 +112,28 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 					region = credReq.GetAwsCredential().GetRegion()
 					name = credReq.GetName()
 
+					By("verfiying credentials")
+					_, err = credClient.Validate(context.Background(), &api.SdkCredentialValidateRequest{CredentialId: credID})
+					Expect(err).NotTo(HaveOccurred())
+
+					By("inspecting credentials")
+					inspectReq := &api.SdkCredentialInspectRequest{CredentialId: credID}
+					inspectResp, err := credClient.Inspect(context.Background(), inspectReq)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(inspectResp.GetName()).To(Equal(name))
+					Expect(inspectResp.GetAwsCredential().GetAccessKey()).To(BeEquivalentTo(accessKey))
+					Expect(inspectResp.GetAwsCredential().GetRegion()).To(BeEquivalentTo(region))
+
+					By("deleting credentials")
+					_, err = credClient.Delete(context.Background(), &api.SdkCredentialDeleteRequest{CredentialId: credID})
+					Expect(err).NotTo(HaveOccurred())
 					break
 				}
 			}
-
-			if len(credID) == 0 {
-				Skip("No provider given, skipping tests. Currently only aws provider is supported")
-			}
-
-			inspectReq := &api.SdkCredentialInspectRequest{CredentialId: credID}
-			inspectResp, err := credClient.Inspect(context.Background(), inspectReq)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inspectResp.GetName()).To(Equal(name))
-			Expect(inspectResp.GetAwsCredential().GetAccessKey()).To(BeEquivalentTo(accessKey))
-			Expect(inspectResp.GetAwsCredential().GetRegion()).To(BeEquivalentTo(region))
-		})
-	})
-
-	Describe("Credentials Validate", func() {
-
-		It("Should validate created Credentials", func() {
-
-			numCredCreated := parseAndCreateCredentials(credClient)
-			credEnumReq := &api.SdkCredentialEnumerateRequest{}
-			credEnumResp, err := credClient.Enumerate(context.Background(), credEnumReq)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(len(credEnumResp.GetCredentialIds())).To(Equal(numCredCreated))
-			for _, credID := range credEnumResp.GetCredentialIds() {
-				_, err = credClient.Validate(context.Background(), &api.SdkCredentialValidateRequest{CredentialId: credID})
-				Expect(err).NotTo(HaveOccurred())
-			}
-
 		})
 	})
 
 	Describe("Credentials Delete", func() {
-		It("Should delete created Credentials", func() {
-
-			numCredCreated := parseAndCreateCredentials(credClient)
-			credEnumReq := &api.SdkCredentialEnumerateRequest{}
-			credEnumResp, err := credClient.Enumerate(context.Background(), credEnumReq)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(len(credEnumResp.GetCredentialIds())).To(Equal(numCredCreated))
-			for _, credID := range credEnumResp.GetCredentialIds() {
-				_, err = credClient.Delete(context.Background(), &api.SdkCredentialDeleteRequest{CredentialId: credID})
-				Expect(err).NotTo(HaveOccurred())
-			}
-			credEnumReq = &api.SdkCredentialEnumerateRequest{}
-			credEnumResp, err = credClient.Enumerate(context.Background(), credEnumReq)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(credEnumResp.GetCredentialIds()).To(BeNil())
-
-		})
-
 		It("Should failed to delete non-existanant Credentials", func() {
 
 			_, err := credClient.Delete(context.Background(), &api.SdkCredentialDeleteRequest{CredentialId: ""})
