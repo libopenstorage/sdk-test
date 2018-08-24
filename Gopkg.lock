@@ -46,11 +46,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d5e35df76cbd12cdb445a66ce21015acb0cf52e619987fe46d179d1ff2c92d26"
+  digest = "1:51b402cc4bc6d3d4b2c946e46ec4e24f56ce6997d77d97ba99e7cb201f21ead7"
   name = "github.com/libopenstorage/openstorage-sdk-clients"
   packages = ["sdk/golang"]
   pruneopts = "UT"
-  revision = "9fbbb09d930d3d35fd0383d98e6573973182fbae"
+  revision = "96cab306baf84bed5f13837b85e5252e47821a49"
 
 [[projects]]
   digest = "1:42e29deef12327a69123b9cb2cb45fee4af5c12c2a23c6e477338279a052703f"
