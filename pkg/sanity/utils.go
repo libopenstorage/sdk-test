@@ -86,10 +86,11 @@ func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int 
 				Name: providerParams["CredName"],
 				CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
 					AwsCredential: &api.SdkAwsCredentialRequest{
-						AccessKey: providerParams["CredAccessKey"],
-						SecretKey: providerParams["CredSecretKey"],
-						Endpoint:  providerParams["CredEndpoint"],
-						Region:    providerParams["CredRegion"],
+						AccessKey:  providerParams["CredAccessKey"],
+						SecretKey:  providerParams["CredSecretKey"],
+						Endpoint:   providerParams["CredEndpoint"],
+						Region:     providerParams["CredRegion"],
+						DisableSsl: providerParams["CredDisableSSL"] == "true",
 					},
 				},
 			}
@@ -184,10 +185,11 @@ func parseAndCreateCredentials2(credClient api.OpenStorageCredentialsClient) map
 				Name: providerParams["CredName"],
 				CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
 					AwsCredential: &api.SdkAwsCredentialRequest{
-						AccessKey: providerParams["CredAccessKey"],
-						SecretKey: providerParams["CredSecretKey"],
-						Endpoint:  providerParams["CredEndpoint"],
-						Region:    providerParams["CredRegion"],
+						AccessKey:  providerParams["CredAccessKey"],
+						SecretKey:  providerParams["CredSecretKey"],
+						Endpoint:   providerParams["CredEndpoint"],
+						Region:     providerParams["CredRegion"],
+						DisableSsl: providerParams["CredDisableSSL"] == "true",
 					},
 				},
 			}

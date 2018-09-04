@@ -63,7 +63,7 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 		}
 	})
 
-	Describe("Credentials Create", func() {
+	Describe("Credentials Create [Buggy]", func() {
 		It("Should Create Credentials", func() {
 			credEnumReq := &api.SdkCredentialEnumerateRequest{}
 			credEnumResp, err := credClient.Enumerate(context.Background(), credEnumReq)
@@ -95,10 +95,11 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 						Name: providerParams["CredName"],
 						CredentialType: &api.SdkCredentialCreateRequest_AwsCredential{
 							AwsCredential: &api.SdkAwsCredentialRequest{
-								AccessKey: providerParams["CredAccessKey"],
-								SecretKey: providerParams["CredSecretKey"],
-								Endpoint:  providerParams["CredEndpoint"],
-								Region:    providerParams["CredRegion"],
+								AccessKey:  providerParams["CredAccessKey"],
+								SecretKey:  providerParams["CredSecretKey"],
+								Endpoint:   providerParams["CredEndpoint"],
+								Region:     providerParams["CredRegion"],
+								DisableSsl: providerParams["CredDisableSSL"] == "true",
 							},
 						},
 					}
