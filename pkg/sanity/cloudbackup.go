@@ -708,12 +708,16 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			}
 
 			By("Getting cloud backup history of the created volume")
+			// Wait 5 seconds as that's the amount of time we can have as a delta between done and alert being fired
+			time.Sleep(5 * time.Second)
+
 			historyResp, err := bc.History(
 				context.Background(),
 				&api.SdkCloudBackupHistoryRequest{
 					SrcVolumeId: volID,
 				},
 			)
+
 			Expect(err).NotTo(HaveOccurred())
 			Expect(historyResp.GetHistoryList()).NotTo(BeEmpty())
 		})
