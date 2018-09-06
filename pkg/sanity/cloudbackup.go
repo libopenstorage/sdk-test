@@ -359,7 +359,6 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				enumerateResp, err := bc.Enumerate(
 					context.Background(),
 					&api.SdkCloudBackupEnumerateRequest{
-						All:          true,
 						ClusterId:    clusterID,
 						CredentialId: credID,
 						SrcVolumeId:  volID,
@@ -393,8 +392,9 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					CredentialId: credID,
 				}
 
-				_, err := bc.Enumerate(context.Background(), enumerateReq)
-				Expect(err).To(HaveOccurred())
+				resp, err := bc.Enumerate(context.Background(), enumerateReq)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(resp.GetBackups()).To(BeEmpty())
 			}
 		})
 
