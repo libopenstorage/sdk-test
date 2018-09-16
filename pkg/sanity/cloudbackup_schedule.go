@@ -33,6 +33,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 		vc api.OpenStorageVolumeClient
 		bc api.OpenStorageCloudBackupClient
 		ic api.OpenStorageIdentityClient
+		ma api.OpenStorageMountAttachClient
 
 		volID        string
 		credID       string
@@ -45,6 +46,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 		bc = api.NewOpenStorageCloudBackupClient(conn)
 		vc = api.NewOpenStorageVolumeClient(conn)
 		ic = api.NewOpenStorageIdentityClient(conn)
+		ma = api.NewOpenStorageMountAttachClient(conn)
 
 		isSupported := isCapabilitySupported(
 			ic,
@@ -79,10 +81,13 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 		}
 
 		if volID != "" {
-			_, err := vc.Detach(
+			_, err := ma.Detach(
 				context.Background(),
 				&api.SdkVolumeDetachRequest{
 					VolumeId: volID,
+					Options: &api.SdkVolumeDetachRequest_Options{
+						UnmountBeforeDetach: true,
+					},
 				},
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -94,7 +99,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 		}
 	})
 
-	Describe("Backup Schedule	 Create", func() {
+	Describe("Backup Schedule Create", func() {
 
 		It("Should create a cloud backup schedule successfully", func() {
 			By("First creating the volume")
@@ -107,7 +112,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
@@ -295,7 +300,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
@@ -357,7 +362,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,

@@ -35,11 +35,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	var (
 		c  api.OpenStorageVolumeClient
 		ic api.OpenStorageIdentityClient
+		ma api.OpenStorageMountAttachClient
 	)
 
 	BeforeEach(func() {
 		c = api.NewOpenStorageVolumeClient(conn)
 		ic = api.NewOpenStorageIdentityClient(conn)
+		ma = api.NewOpenStorageMountAttachClient(conn)
 
 		isSupported := isCapabilitySupported(
 			ic,
@@ -417,10 +419,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 				// Detach the attached Volume
 				// before deleting
-				detachResponse, err := c.Detach(
+				detachResponse, err := ma.Detach(
 					context.Background(),
 					&api.SdkVolumeDetachRequest{
 						VolumeId: volID,
+						Options: &api.SdkVolumeDetachRequest_Options{
+							UnmountBeforeDetach: true,
+						},
 					},
 				)
 				Expect(err).NotTo(HaveOccurred())
@@ -452,7 +457,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Attaching the created Volume")
 
-			resp, err := c.Attach(
+			resp, err := ma.Attach(
 				context.Background(),
 				&api.SdkVolumeAttachRequest{
 					VolumeId: volID,
@@ -470,7 +475,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		// 	By("Passing a non-existent volume id for Attach")
 
-		// 	resp, err := c.Attach(
+		// 	resp, err := ma.Attach(
 		// 		context.Background(),
 		// 		&api.SdkVolumeAttachRequest{
 		// 			VolumeId: "attach-doesnt-exist",
@@ -488,7 +493,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Passing a empty volume id for Attach")
 
-			resp, err := c.Attach(
+			resp, err := ma.Attach(
 				context.Background(),
 				&api.SdkVolumeAttachRequest{
 					VolumeId: "",
@@ -541,7 +546,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Attaching the created Volume")
 
-			resp, err := c.Attach(
+			resp, err := ma.Attach(
 				context.Background(),
 				&api.SdkVolumeAttachRequest{
 					VolumeId: volID,
@@ -553,10 +558,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Detaching the attached volume")
 
-			detachResponse, err := c.Detach(
+			detachResponse, err := ma.Detach(
 				context.Background(),
 				&api.SdkVolumeDetachRequest{
 					VolumeId: volID,
+					Options: &api.SdkVolumeDetachRequest_Options{
+						UnmountBeforeDetach: true,
+					},
 				},
 			)
 
@@ -583,7 +591,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		// 	By("Detaching a non-attached volume")
 
-		// 	_, err = c.Detach(
+		// 	_, err = ma.Detach(
 		// 		context.Background(),
 		// 		&api.SdkVolumeDetachRequest{
 		// 			VolumeId: volID,
@@ -600,7 +608,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		// 	By("Detaching a non-existent volume")
 
-		// 	_, err := c.Detach(
+		// 	_, err := ma.Detach(
 		// 		context.Background(),
 		// 		&api.SdkVolumeDetachRequest{
 		// 			VolumeId: "dummy-doesn't exist",
@@ -617,10 +625,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Detaching a non-existent volume")
 
-			_, err := c.Detach(
+			_, err := ma.Detach(
 				context.Background(),
 				&api.SdkVolumeDetachRequest{
 					VolumeId: "",
+					Options: &api.SdkVolumeDetachRequest_Options{
+						UnmountBeforeDetach: true,
+					},
 				},
 			)
 			Expect(err).To(HaveOccurred())
@@ -647,7 +658,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			if volID != "" {
 				// Unmount the mounted volume first
 				// before deleting
-				unmountResponse, err := c.Unmount(
+				unmountResponse, err := ma.Unmount(
 					context.Background(),
 					&api.SdkVolumeUnmountRequest{
 						VolumeId:  volID,
@@ -658,10 +669,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				Expect(unmountResponse).NotTo(BeNil())
 				// Detach the attached Volume
 				// before deleting
-				detachResponse, err := c.Detach(
+				detachResponse, err := ma.Detach(
 					context.Background(),
 					&api.SdkVolumeDetachRequest{
 						VolumeId: volID,
+						Options: &api.SdkVolumeDetachRequest_Options{
+							UnmountBeforeDetach: true,
+						},
 					},
 				)
 				Expect(err).NotTo(HaveOccurred())
@@ -695,7 +709,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Attaching the created Volume")
 
-			resp, err := c.Attach(
+			resp, err := ma.Attach(
 				context.Background(),
 				&api.SdkVolumeAttachRequest{
 					VolumeId: volID,
@@ -706,7 +720,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Mounting the attached Volume")
 
-			mountResponse, err := c.Mount(
+			mountResponse, err := ma.Mount(
 				context.Background(),
 				&api.SdkVolumeMountRequest{
 					VolumeId:  volID,
@@ -737,7 +751,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		// 	By("Attaching the created Volume")
 
-		// 	resp, err := c.Attach(
+		// 	resp, err := ma.Attach(
 		// 		context.Background(),
 		// 		&api.SdkVolumeAttachRequest{
 		// 			VolumeId: volID,
@@ -748,7 +762,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		// 	By("Mounting a non-attached Volume")
 
-		// 	_, err = c.Mount(
+		// 	_, err = ma.Mount(
 		// 		context.Background(),
 		// 		&api.SdkVolumeMountRequest{
 		// 			VolumeId:  volID,
@@ -768,7 +782,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		// 	By("Mounting a non-existent Volume")
 
-		// 	_, err := c.Mount(
+		// 	_, err := ma.Mount(
 		// 		context.Background(),
 		// 		&api.SdkVolumeMountRequest{
 		// 			VolumeId:  "dummy-doesnt-exist",
@@ -785,7 +799,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Mounting a Volume with empty id")
 
-			_, err := c.Mount(
+			_, err := ma.Mount(
 				context.Background(),
 				&api.SdkVolumeMountRequest{
 					VolumeId:  "",

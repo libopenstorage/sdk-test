@@ -60,6 +60,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 		c  api.OpenStorageClusterClient
 		nc api.OpenStorageNodeClient
 		ic api.OpenStorageIdentityClient
+		ma api.OpenStorageMountAttachClient
 
 		bkpStatusReq *api.SdkCloudBackupStatusRequest
 		bkpStatus    *api.SdkCloudBackupStatus
@@ -78,6 +79,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 		c = api.NewOpenStorageClusterClient(conn)
 		nc = api.NewOpenStorageNodeClient(conn)
 		ic = api.NewOpenStorageIdentityClient(conn)
+		ma = api.NewOpenStorageMountAttachClient(conn)
 
 		isSupported := isCapabilitySupported(
 			ic,
@@ -125,10 +127,13 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 		}
 
 		if volID != "" {
-			_, err := vc.Detach(
+			_, err := ma.Detach(
 				context.Background(),
 				&api.SdkVolumeDetachRequest{
 					VolumeId: volID,
+					Options: &api.SdkVolumeDetachRequest_Options{
+						UnmountBeforeDetach: true,
+					},
 				},
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -153,7 +158,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
@@ -309,7 +314,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
@@ -514,7 +519,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
@@ -661,7 +666,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
@@ -786,7 +791,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
@@ -884,7 +889,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
@@ -1017,7 +1022,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				By("Attaching the created volume")
-				str, err := vc.Attach(
+				str, err := ma.Attach(
 					context.Background(),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
