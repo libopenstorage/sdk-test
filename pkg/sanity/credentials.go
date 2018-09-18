@@ -86,7 +86,6 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 			credID := ""
 			accessKey := ""
 			region := ""
-			name := ""
 
 			// Create credential from cb.yaml
 			for provider, providerParams := range config.ProviderConfig.CloudProviders {
@@ -111,7 +110,6 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 					Expect(credID).NotTo(BeEmpty())
 					accessKey = credReq.GetAwsCredential().GetAccessKey()
 					region = credReq.GetAwsCredential().GetRegion()
-					name = credReq.GetName()
 
 					By("verfiying credentials")
 					_, err = credClient.Validate(context.Background(), &api.SdkCredentialValidateRequest{CredentialId: credID})
@@ -121,7 +119,6 @@ var _ = Describe("Credentials [OpenStorageCredentials]", func() {
 					inspectReq := &api.SdkCredentialInspectRequest{CredentialId: credID}
 					inspectResp, err := credClient.Inspect(context.Background(), inspectReq)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(inspectResp.GetName()).To(Equal(name))
 					Expect(inspectResp.GetAwsCredential().GetAccessKey()).To(BeEquivalentTo(accessKey))
 					Expect(inspectResp.GetAwsCredential().GetRegion()).To(BeEquivalentTo(region))
 
