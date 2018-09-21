@@ -71,20 +71,7 @@ var _ = Describe("Identity Service", func() {
 
 			By("checking successful response")
 			Expect(res.Capabilities).NotTo(BeNil())
-
-			for _, cap := range res.GetCapabilities() {
-				switch cap.GetService().GetType() {
-				case api.SdkServiceCapability_OpenStorageService_CLOUD_BACKUP:
-				case api.SdkServiceCapability_OpenStorageService_CLUSTER:
-				case api.SdkServiceCapability_OpenStorageService_CREDENTIALS:
-				case api.SdkServiceCapability_OpenStorageService_NODE:
-				case api.SdkServiceCapability_OpenStorageService_OBJECT_STORAGE:
-				case api.SdkServiceCapability_OpenStorageService_SCHEDULE_POLICY:
-				case api.SdkServiceCapability_OpenStorageService_VOLUME:
-				default:
-					Fail(fmt.Sprintf("Unknown capability: %v\n", cap.GetService().GetType()))
-				}
-			}
+			Expect(res.Capabilities).NotTo(BeEmpty())
 		})
 	})
 })
