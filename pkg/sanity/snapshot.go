@@ -38,11 +38,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	var (
 		c  api.OpenStorageVolumeClient
 		ic api.OpenStorageIdentityClient
+		sc api.OpenStorageSchedulePolicyClient
 	)
 
 	BeforeEach(func() {
 		c = api.NewOpenStorageVolumeClient(conn)
 		ic = api.NewOpenStorageIdentityClient(conn)
+		sc = api.NewOpenStorageSchedulePolicyClient(conn)
 
 		isSupported := isCapabilitySupported(
 			ic,
@@ -317,6 +319,81 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				SnapshotId: snapID,
 			})
 			Expect(err).NotTo(HaveOccurred())
+		})
+	})
+
+	Describe("VolumeSnapshotScheduleUpdate", func() {
+
+		var (
+			volID string
+			policyName string
+		)
+
+		BeforeEach(func() {
+			volID = ""
+			policyName = ""
+		})
+
+		AfterEach(func() {
+			var err error
+
+			if len(volID) != 0 {
+				_, err = c.Delete(context.Background(),
+					&api.SdkVolumeDeleteRequest{VolumeId: volID},
+				)
+			}
+			if len(policyName) = 0 {
+				err = sc.Delete(context.Background(),
+					&api.SdkSchedulePolicyDeleteRequest{Name: policyName})
+			}
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should set the schedule in the volume spec", func() {
+
+			By("Creating the volume")
+			var err error
+			req := &api.SdkVolumeCreateRequest{
+				Name: fmt.Sprintf("sdk-vol-%d", time.Now().Unix()),
+				Spec: &api.VolumeSpec{
+					Size:    uint64(5 * GIGABYTE),
+					HaLevel: 3,
+					Format:  api.FSType_FS_TYPE_EXT4,
+				},
+			}
+			vResp, err := c.Create(context.Background(), req)
+			Expect(err).NotTo(HaveOccurred())
+			volID = vResp.GetVolumeId()
+
+			By("Creating a schedule policy")
+			policyName = fmt.Sprintf("mypolicy-%d", time.Now().Unix())
+			policyReq := &api.SdkSchedulePolicyCreateRequest{
+				SchedulePolicy: &api.SdkSchedulePolicy{
+					Name: policyName,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							Retain: 2,
+							PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
+								Weekly: &api.SdkSchedulePolicyIntervalWeekly{
+									Day:    api.SdkTimeWeekday_SdkTimeWeekdaySunday,
+									Hour:   0,
+									Minute: 30,
+								},
+							},
+						},
+					},
+				},
+			}
+			err = sc.Create(context.Background(), policyReq)
+			Expect(err).NotTo(HaveOccurred())
+
+			By("Confirming the schedule name is in the volume spec")
+			inspectResponse, err := c.Inspect(context.Background(), &api.SdkVolumeInspectRequest{
+				VolumeId: vResp.VolumeId,
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(inspectResponse).NotTo(BeNil())
+			Expect(inspectResponse.GetVolume().GetSpec().GetSnapshotSchedule()).To(Equal(fmt.Sprintf("policy=%d", policyName)))
 		})
 	})
 
