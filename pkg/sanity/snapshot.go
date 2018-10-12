@@ -322,10 +322,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 	})
 
-	Describe("VolumeSnapshotScheduleUpdate", func() {
+	XDescribe("VolumeSnapshotScheduleUpdate", func() {
 
 		var (
-			volID string
+			volID      string
 			policyName string
 		)
 
@@ -342,8 +342,8 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					&api.SdkVolumeDeleteRequest{VolumeId: volID},
 				)
 			}
-			if len(policyName) = 0 {
-				err = sc.Delete(context.Background(),
+			if len(policyName) != 0 {
+				_, err = sc.Delete(context.Background(),
 					&api.SdkSchedulePolicyDeleteRequest{Name: policyName})
 			}
 			Expect(err).ToNot(HaveOccurred())
@@ -384,7 +384,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					},
 				},
 			}
-			err = sc.Create(context.Background(), policyReq)
+			_, err = sc.Create(context.Background(), policyReq)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Confirming the schedule name is in the volume spec")
@@ -393,7 +393,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResponse).NotTo(BeNil())
-			Expect(inspectResponse.GetVolume().GetSpec().GetSnapshotSchedule()).To(Equal(fmt.Sprintf("policy=%d", policyName)))
+			Expect(inspectResponse.GetVolume().GetSpec().GetSnapshotSchedule()).To(Equal(fmt.Sprintf("policy=%s", policyName)))
 		})
 	})
 
