@@ -322,7 +322,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 	})
 
-	XDescribe("VolumeSnapshotScheduleUpdate", func() {
+	Describe("VolumeSnapshotScheduleUpdate", func() {
 
 		var (
 			volID      string
@@ -351,7 +351,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		It("should set the schedule in the volume spec", func() {
 
-			By("Creating the volume")
+			By("creating the volume")
 			var err error
 			req := &api.SdkVolumeCreateRequest{
 				Name: fmt.Sprintf("sdk-vol-%d", time.Now().Unix()),
@@ -365,7 +365,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Expect(err).NotTo(HaveOccurred())
 			volID = vResp.GetVolumeId()
 
-			By("Creating a schedule policy")
+			By("creating a schedule policy")
 			policyName = fmt.Sprintf("mypolicy-%d", time.Now().Unix())
 			policyReq := &api.SdkSchedulePolicyCreateRequest{
 				SchedulePolicy: &api.SdkSchedulePolicy{
@@ -387,7 +387,14 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			_, err = sc.Create(context.Background(), policyReq)
 			Expect(err).NotTo(HaveOccurred())
 
-			By("Confirming the schedule name is in the volume spec")
+			By("applying schedule to the volume")
+			_, err = c.SnapshotScheduleUpdate(context.Background(), &api.SdkVolumeSnapshotScheduleUpdateRequest{
+				VolumeId:              volID,
+				SnapshotScheduleNames: []string{policyName},
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			By("confirming the schedule name is in the volume spec")
 			inspectResponse, err := c.Inspect(context.Background(), &api.SdkVolumeInspectRequest{
 				VolumeId: vResp.VolumeId,
 			})

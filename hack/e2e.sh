@@ -9,6 +9,7 @@ MOCKSDK="mocksdk"
 PORT="8180"
 GWPORT="8181"
 
+make install || fail "make failed"
 docker pull openstorage/mock-sdk-server
 docker stop ${MOCKSDK} > /dev/null 2>&1
 docker run --rm --name ${MOCKSDK} -d -p ${PORT}:9100 -p ${GWPORT}:9110 openstorage/mock-sdk-server || fail "Unable to start server"
