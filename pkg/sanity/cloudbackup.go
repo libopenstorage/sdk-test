@@ -175,8 +175,10 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				_, err = bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(context.Background(), backupReq)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(backup).NotTo(BeNil())
+				Expect(backup.GetTaskId()).NotTo(BeEmpty())
 
 				// timeout after 5 mins
 				timeout := 300
@@ -188,7 +190,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
 					Expect(err).To(BeNil())
 
-					bkpStatus = bkpStatusResp.Statuses[volID]
+					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
+					Expect(bkpStatus).ToNot(BeNil())
 
 					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone {
 						break
@@ -331,8 +334,10 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				_, err = bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(context.Background(), backupReq)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(backup).NotTo(BeNil())
+				Expect(backup.GetTaskId()).NotTo(BeEmpty())
 
 				// timeout after 5 mins
 				timeout := 300
@@ -344,7 +349,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
 					Expect(err).To(BeNil())
 
-					bkpStatus = bkpStatusResp.Statuses[volID]
+					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
+					Expect(bkpStatus).ToNot(BeNil())
 
 					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone {
 						break
@@ -536,8 +542,10 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				_, err = bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(context.Background(), backupReq)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(backup).NotTo(BeNil())
+				Expect(backup.GetTaskId()).NotTo(BeEmpty())
 
 				// timeout after 5 mins
 				timeout := 300
@@ -549,7 +557,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
 					Expect(err).To(BeNil())
 
-					bkpStatus = bkpStatusResp.Statuses[volID]
+					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
+					Expect(bkpStatus).ToNot(BeNil())
 
 					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone {
 						break
@@ -683,8 +692,10 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				_, err = bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(context.Background(), backupReq)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(backup).NotTo(BeNil())
+				Expect(backup.GetTaskId()).NotTo(BeEmpty())
 
 				// timeout after 5 mins
 				timeout := 300
@@ -696,7 +707,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
 					Expect(err).To(BeNil())
 
-					bkpStatus = bkpStatusResp.Statuses[volID]
+					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
+					Expect(bkpStatus).ToNot(BeNil())
 
 					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone {
 						break
@@ -808,8 +820,10 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				_, err = bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(context.Background(), backupReq)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(backup).NotTo(BeNil())
+				Expect(backup.GetTaskId()).NotTo(BeEmpty())
 
 				// timeout after 5 mins
 				timeout := 300
@@ -821,7 +835,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
 					Expect(err).To(BeNil())
 
-					bkpStatus = bkpStatusResp.Statuses[volID]
+					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
+					Expect(bkpStatus).ToNot(BeNil())
 
 					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone {
 						break
@@ -906,8 +921,10 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				_, err = bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(context.Background(), backupReq)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(backup).NotTo(BeNil())
+				Expect(backup.GetTaskId()).NotTo(BeEmpty())
 
 				// timeout after 5 mins
 				timeout := 300
@@ -919,7 +936,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
 					Expect(err).To(BeNil())
 
-					bkpStatus = bkpStatusResp.Statuses[volID]
+					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
+					Expect(bkpStatus).ToNot(BeNil())
 
 					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone {
 						break
@@ -1039,8 +1057,10 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				_, err = bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(context.Background(), backupReq)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(backup).NotTo(BeNil())
+				Expect(backup.GetTaskId()).NotTo(BeEmpty())
 
 				// timeout after 5 mins
 				timeout := 300
@@ -1052,7 +1072,8 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
 					Expect(err).To(BeNil())
 
-					bkpStatus = bkpStatusResp.Statuses[volID]
+					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
+					Expect(bkpStatus).ToNot(BeNil())
 
 					if bkpStatus.Status == api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone {
 						break
