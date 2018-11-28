@@ -30,12 +30,12 @@ import (
 
 func getBackupId(bc api.OpenStorageCloudBackupClient, clusterId, volumeId, credentialId string) string {
 
-	enumerateReq := &api.SdkCloudBackupEnumerateRequest{
+	enumerateReq := &api.SdkCloudBackupEnumerateWithFiltersRequest{
 		ClusterId:    clusterId,
 		SrcVolumeId:  volumeId,
 		CredentialId: credentialId,
 	}
-	enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
+	enumerateResp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(enumerateResp).NotTo(BeNil())
 	Expect(enumerateResp.GetBackups()).NotTo(BeEmpty())
@@ -367,9 +367,9 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Enumerating the cloud backups")
 
-				enumerateResp, err := bc.Enumerate(
+				enumerateResp, err := bc.EnumerateWithFilters(
 					context.Background(),
-					&api.SdkCloudBackupEnumerateRequest{
+					&api.SdkCloudBackupEnumerateWithFiltersRequest{
 						ClusterId:    clusterID,
 						CredentialId: credID,
 						SrcVolumeId:  volID,
@@ -397,13 +397,13 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Doing Backup on " + provider)
 
-				enumerateReq := &api.SdkCloudBackupEnumerateRequest{
+				enumerateReq := &api.SdkCloudBackupEnumerateWithFiltersRequest{
 					ClusterId:    clusterID,
 					SrcVolumeId:  "this-doesnt-exist",
 					CredentialId: credID,
 				}
 
-				resp, err := bc.Enumerate(context.Background(), enumerateReq)
+				resp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(resp.GetBackups()).To(BeEmpty())
 			}
@@ -428,13 +428,13 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 		// 		By("Doing Backup on " + provider)
 
-		// 		enumerateReq := &api.SdkCloudBackupEnumerateRequest{
+		// 		enumerateReq := &api.SdkCloudBackupEnumerateWithFiltersRequest{
 		// 			ClusterId:    clusterID,
 		// 			SrcVolumeId:  "",
 		// 			CredentialId: credID,
 		// 		}
 
-		// 		enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
+		// 		enumerateResp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
 		// 		Expect(err).To(HaveOccurred())
 		// 		Expect(enumerateResp).To(BeNil())
 
@@ -456,13 +456,13 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Creating the volume")
 			volID = newTestVolume(vc)
 
-			enumerateReq := &api.SdkCloudBackupEnumerateRequest{
+			enumerateReq := &api.SdkCloudBackupEnumerateWithFiltersRequest{
 				ClusterId:    clusterID,
 				SrcVolumeId:  volID,
 				CredentialId: "dummy-credentials",
 			}
 
-			enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
+			enumerateResp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
 			Expect(err).To(HaveOccurred())
 			Expect(enumerateResp).To(BeNil())
 
@@ -485,13 +485,13 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			volID = newTestVolume(vc)
 
 			By("Doing cloudbakup enumerate")
-			enumerateReq := &api.SdkCloudBackupEnumerateRequest{
+			enumerateReq := &api.SdkCloudBackupEnumerateWithFiltersRequest{
 				ClusterId:    clusterID,
 				SrcVolumeId:  volID,
 				CredentialId: "",
 			}
 
-			enumerateResp, err := bc.Enumerate(context.Background(), enumerateReq)
+			enumerateResp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
 			Expect(err).To(HaveOccurred())
 			Expect(enumerateResp).To(BeNil())
 
