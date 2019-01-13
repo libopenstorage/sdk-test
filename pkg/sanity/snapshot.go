@@ -72,13 +72,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 
 		AfterEach(func() {
-			var err error
-
-			_, err = c.Delete(context.Background(),
-				&api.SdkVolumeDeleteRequest{VolumeId: volID},
-			)
-			Expect(err).ToNot(HaveOccurred())
-
+			if len(volID) != 0 {
+				err := deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
+				Expect(err).NotTo(HaveOccurred())
+			}
 		})
 
 		It("Should create Volume successfully for snapshot", func() {
@@ -98,7 +98,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				},
 			}
 
-			vResp, err := c.Create(context.Background(), req)
+			vResp, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Checking if volume created successfully with the provided params")
@@ -107,7 +107,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			inspectReq := &api.SdkVolumeInspectRequest{
 				VolumeId: vResp.VolumeId,
 			}
-			inspectResponse, err := c.Inspect(context.Background(), inspectReq)
+			inspectResponse, err := c.Inspect(setContextWithToken(context.Background(), users["admin"]), inspectReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResponse).NotTo(BeNil())
 
@@ -124,14 +124,14 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					"Name": "snapshot-of" + volID,
 				},
 			}
-			resp, err := c.SnapshotCreate(context.Background(), vreq)
+			resp, err := c.SnapshotCreate(setContextWithToken(context.Background(), users["admin"]), vreq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp.GetSnapshotId()).To(Not(BeNil()))
 			snapID = resp.GetSnapshotId()
 
 			By("Checking the Parent field of the created snapshot")
 
-			volumes, err := c.Inspect(context.Background(), &api.SdkVolumeInspectRequest{
+			volumes, err := c.Inspect(setContextWithToken(context.Background(), users["admin"]), &api.SdkVolumeInspectRequest{
 				VolumeId: snapID,
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -156,15 +156,18 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		AfterEach(func() {
 			var err error
 
-			_, err = c.Delete(context.Background(),
-				&api.SdkVolumeDeleteRequest{VolumeId: volID},
-			)
-			Expect(err).ToNot(HaveOccurred())
-
+			if len(volID) != 0 {
+				err = deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
+				Expect(err).NotTo(HaveOccurred())
+			}
 			for _, snapID := range snapIDs {
-				_, err = c.Delete(context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: snapID},
-				)
+				err = deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					snapID)
 				Expect(err).ToNot(HaveOccurred())
 			}
 
@@ -187,13 +190,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				},
 			}
 
-			vResp, err := c.Create(context.Background(), req)
+			vResp, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 
 			inspectReq := &api.SdkVolumeInspectRequest{
 				VolumeId: vResp.VolumeId,
 			}
-			inspectResponse, err := c.Inspect(context.Background(), inspectReq)
+			inspectResponse, err := c.Inspect(setContextWithToken(context.Background(), users["admin"]), inspectReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResponse).NotTo(BeNil())
 
@@ -213,14 +216,14 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					},
 				}
 
-				snapResp, err := c.SnapshotCreate(context.Background(), snapReq)
+				snapResp, err := c.SnapshotCreate(setContextWithToken(context.Background(), users["admin"]), snapReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(snapResp.GetSnapshotId()).To(Not(BeNil()))
 				snapIDs = append(snapIDs, snapResp.GetSnapshotId())
 
 				By("Checking the Parent field of the created snapshot")
 
-				volResp, err := c.Inspect(context.Background(), &api.SdkVolumeInspectRequest{
+				volResp, err := c.Inspect(setContextWithToken(context.Background(), users["admin"]), &api.SdkVolumeInspectRequest{
 					VolumeId: snapResp.GetSnapshotId(),
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -229,7 +232,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Enumerating the snapshots with the volumeID")
 
-			snapEnumResp, err := c.SnapshotEnumerate(context.Background(), &api.SdkVolumeSnapshotEnumerateRequest{
+			snapEnumResp, err := c.SnapshotEnumerate(setContextWithToken(context.Background(), users["admin"]), &api.SdkVolumeSnapshotEnumerateRequest{
 				VolumeId: volID,
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -249,12 +252,13 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 
 		AfterEach(func() {
-			var err error
-
-			_, err = c.Delete(context.Background(),
-				&api.SdkVolumeDeleteRequest{VolumeId: volID},
-			)
-			Expect(err).ToNot(HaveOccurred())
+			if len(volID) != 0 {
+				err := deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
+				Expect(err).NotTo(HaveOccurred())
+			}
 
 		})
 
@@ -275,14 +279,14 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				},
 			}
 
-			vResp, err := c.Create(context.Background(), req)
+			vResp, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			volID = vResp.GetVolumeId()
 
 			inspectReq := &api.SdkVolumeInspectRequest{
 				VolumeId: vResp.VolumeId,
 			}
-			inspectResponse, err := c.Inspect(context.Background(), inspectReq)
+			inspectResponse, err := c.Inspect(setContextWithToken(context.Background(), users["admin"]), inspectReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResponse).NotTo(BeNil())
 
@@ -299,14 +303,14 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				},
 			}
 
-			snapResp, err := c.SnapshotCreate(context.Background(), snapReq)
+			snapResp, err := c.SnapshotCreate(setContextWithToken(context.Background(), users["admin"]), snapReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(snapResp.GetSnapshotId()).To(Not(BeNil()))
 			snapID = snapResp.GetSnapshotId()
 
 			By("Checking the Parent field of the created snapshot")
 
-			volResp, err := c.Inspect(context.Background(), &api.SdkVolumeInspectRequest{
+			volResp, err := c.Inspect(setContextWithToken(context.Background(), users["admin"]), &api.SdkVolumeInspectRequest{
 				VolumeId: snapResp.GetSnapshotId(),
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -314,7 +318,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Restoring the volume from snapshot")
 
-			_, err = c.SnapshotRestore(context.Background(), &api.SdkVolumeSnapshotRestoreRequest{
+			_, err = c.SnapshotRestore(setContextWithToken(context.Background(), users["admin"]), &api.SdkVolumeSnapshotRestoreRequest{
 				VolumeId:   volID,
 				SnapshotId: snapID,
 			})
@@ -338,12 +342,12 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			var err error
 
 			if len(volID) != 0 {
-				_, err = c.Delete(context.Background(),
+				_, err = c.Delete(setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeDeleteRequest{VolumeId: volID},
 				)
 			}
 			if len(policyName) != 0 {
-				_, err = sc.Delete(context.Background(),
+				_, err = sc.Delete(setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkSchedulePolicyDeleteRequest{Name: policyName})
 			}
 			Expect(err).ToNot(HaveOccurred())
@@ -361,7 +365,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					Format:  api.FSType_FS_TYPE_EXT4,
 				},
 			}
-			vResp, err := c.Create(context.Background(), req)
+			vResp, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			volID = vResp.GetVolumeId()
 
@@ -384,18 +388,18 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					},
 				},
 			}
-			_, err = sc.Create(context.Background(), policyReq)
+			_, err = sc.Create(setContextWithToken(context.Background(), users["admin"]), policyReq)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("applying schedule to the volume")
-			_, err = c.SnapshotScheduleUpdate(context.Background(), &api.SdkVolumeSnapshotScheduleUpdateRequest{
+			_, err = c.SnapshotScheduleUpdate(setContextWithToken(context.Background(), users["admin"]), &api.SdkVolumeSnapshotScheduleUpdateRequest{
 				VolumeId:              volID,
 				SnapshotScheduleNames: []string{policyName},
 			})
 			Expect(err).NotTo(HaveOccurred())
 
 			By("confirming the schedule name is in the volume spec")
-			inspectResponse, err := c.Inspect(context.Background(), &api.SdkVolumeInspectRequest{
+			inspectResponse, err := c.Inspect(setContextWithToken(context.Background(), users["admin"]), &api.SdkVolumeInspectRequest{
 				VolumeId: vResp.VolumeId,
 			})
 			Expect(err).NotTo(HaveOccurred())

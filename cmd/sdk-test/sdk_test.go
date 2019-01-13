@@ -35,6 +35,8 @@ var (
 	mountpath               string
 	version                 bool
 	cloudProviderConfigPath string
+	sharedSecret            string
+	issuer                  string
 )
 
 func init() {
@@ -42,6 +44,8 @@ func init() {
 	flag.StringVar(&mountpath, prefix+"mountpath", "", "Mount path for volumes")
 	flag.BoolVar(&version, prefix+"version", false, "Version of this program")
 	flag.StringVar(&cloudProviderConfigPath, prefix+"cpg", "", "Cloud Provider config file , optional")
+	flag.StringVar(&sharedSecret, prefix+"sharedsecret", "", "Shared secret for auth, ownership, and role testing")
+	flag.StringVar(&issuer, prefix+"issuer", "openstorage.io", "Issuer of token")
 	flag.Parse()
 }
 
@@ -71,6 +75,8 @@ func TestSanity(t *testing.T) {
 	sanity.Test(t, &sanity.SanityConfiguration{
 		Address:        endpoint,
 		MountPath:      mountpath,
+		SharedSecret:   sharedSecret,
+		Issuer:         issuer,
 		ProviderConfig: cfg,
 	})
 }

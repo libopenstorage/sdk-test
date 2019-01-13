@@ -35,7 +35,7 @@ func getBackupId(bc api.OpenStorageCloudBackupClient, clusterId, volumeId, crede
 		SrcVolumeId:  volumeId,
 		CredentialId: credentialId,
 	}
-	enumerateResp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
+	enumerateResp, err := bc.EnumerateWithFilters(setContextWithToken(context.Background(), users["admin"]), enumerateReq)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(enumerateResp).NotTo(BeNil())
 	Expect(enumerateResp.GetBackups()).NotTo(BeEmpty())
@@ -52,7 +52,7 @@ func getBackupId(bc api.OpenStorageCloudBackupClient, clusterId, volumeId, crede
 	return backupId
 }
 
-var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
+var _ = Describe("Cloud backup [OpenStorageClusterBackup]", func() {
 	var (
 		cc api.OpenStorageCredentialsClient
 		vc api.OpenStorageVolumeClient
@@ -107,7 +107,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				if volID != "" {
 
 					_, err := bc.DeleteAll(
-						context.Background(),
+						setContextWithToken(context.Background(), users["admin"]),
 						&api.SdkCloudBackupDeleteAllRequest{
 							SrcVolumeId:  volID,
 							CredentialId: credID,
@@ -117,7 +117,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				}
 
 				_, err := cc.Delete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCredentialDeleteRequest{
 						CredentialId: credID,
 					},
@@ -128,18 +128,19 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 		if volID != "" {
 			_, err := ma.Detach(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeDetachRequest{
 					VolumeId: volID,
-					Options: &api.SdkVolumeDetachRequest_Options{
+					Options: &api.SdkVolumeDetachOptions{
 						UnmountBeforeDetach: true,
 					},
 				},
 			)
 			Expect(err).NotTo(HaveOccurred())
-			_, err = vc.Delete(
-				context.Background(),
-				&api.SdkVolumeDeleteRequest{VolumeId: volID},
+			err = deleteVol(
+				setContextWithToken(context.Background(), users["admin"]),
+				vc,
+				volID,
 			)
 			Expect(err).NotTo(HaveOccurred())
 		}
@@ -159,7 +160,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -175,7 +176,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				backup, err := bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(backup).NotTo(BeNil())
 				Expect(backup.GetTaskId()).NotTo(BeEmpty())
@@ -187,7 +188,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusReq = &api.SdkCloudBackupStatusRequest{
 						VolumeId: volID,
 					}
-					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
+					bkpStatusResp, err := bc.Status(setContextWithToken(context.Background(), users["admin"]), bkpStatusReq)
 					Expect(err).To(BeNil())
 
 					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
@@ -222,12 +223,12 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				_, err := bc.Create(context.Background(), backupReq)
+				_, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).To(HaveOccurred())
 
 				serverError, ok := status.FromError(err)
 				Expect(ok).To(BeTrue())
-				Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
+				Expect(serverError.Code()).To(BeEquivalentTo(codes.NotFound))
 
 			}
 		})
@@ -246,7 +247,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					CredentialId: credID,
 					Full:         false,
 				}
-				_, err := bc.Create(context.Background(), backupReq)
+				_, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).To(HaveOccurred())
 
 				serverError, ok := status.FromError(err)
@@ -267,7 +268,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				CredentialId: "cred-uuid-doesnt-exist",
 				Full:         false,
 			}
-			_, err := bc.Create(context.Background(), backupReq)
+			_, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 			Expect(err).To(HaveOccurred())
 			serverError, ok := status.FromError(err)
 			Expect(ok).To(BeTrue())
@@ -286,7 +287,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				CredentialId: "",
 				Full:         false,
 			}
-			_, err := bc.Create(context.Background(), backupReq)
+			_, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 			Expect(err).To(HaveOccurred())
 			serverError, ok := status.FromError(err)
 			Expect(ok).To(BeTrue())
@@ -303,7 +304,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 			By("Getting the cluster id of the cluster")
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -318,7 +319,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -334,7 +335,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				backup, err := bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(backup).NotTo(BeNil())
 				Expect(backup.GetTaskId()).NotTo(BeEmpty())
@@ -346,7 +347,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusReq = &api.SdkCloudBackupStatusRequest{
 						VolumeId: volID,
 					}
-					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
+					bkpStatusResp, err := bc.Status(setContextWithToken(context.Background(), users["admin"]), bkpStatusReq)
 					Expect(err).To(BeNil())
 
 					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
@@ -368,7 +369,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				By("Enumerating the cloud backups")
 
 				enumerateResp, err := bc.EnumerateWithFilters(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupEnumerateWithFiltersRequest{
 						ClusterId:    clusterID,
 						CredentialId: credID,
@@ -384,7 +385,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 			By("Getting the cluster id of the cluster")
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -403,7 +404,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					CredentialId: credID,
 				}
 
-				resp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
+				resp, err := bc.EnumerateWithFilters(setContextWithToken(context.Background(), users["admin"]), enumerateReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(resp.GetBackups()).To(BeEmpty())
 			}
@@ -415,7 +416,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 		// 	By("Getting the cluster id of the cluster")
 		// 	inpectResp, err := c.InspectCurrent(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkClusterInspectCurrentRequest{},
 		// 	)
 
@@ -434,7 +435,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 		// 			CredentialId: credID,
 		// 		}
 
-		// 		enumerateResp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
+		// 		enumerateResp, err := bc.EnumerateWithFilters(setContextWithToken(context.Background(), users["admin"]), enumerateReq)
 		// 		Expect(err).To(HaveOccurred())
 		// 		Expect(enumerateResp).To(BeNil())
 
@@ -447,7 +448,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 		It("Should fail to enumerate back up if non-existent credentials is passed", func() {
 			By("Getting the cluster id of the cluster")
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -462,7 +463,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				CredentialId: "dummy-credentials",
 			}
 
-			enumerateResp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
+			enumerateResp, err := bc.EnumerateWithFilters(setContextWithToken(context.Background(), users["admin"]), enumerateReq)
 			Expect(err).To(HaveOccurred())
 			Expect(enumerateResp).To(BeNil())
 
@@ -474,7 +475,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 		It("Should fail to enumerate back up if empty credentials is passed", func() {
 			By("Getting the cluster id of the cluster")
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -491,7 +492,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				CredentialId: "",
 			}
 
-			enumerateResp, err := bc.EnumerateWithFilters(context.Background(), enumerateReq)
+			enumerateResp, err := bc.EnumerateWithFilters(setContextWithToken(context.Background(), users["admin"]), enumerateReq)
 			Expect(err).To(HaveOccurred())
 			Expect(enumerateResp).To(BeNil())
 
@@ -508,7 +509,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Getting the cluster id of the cluster")
 
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -526,7 +527,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -542,7 +543,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				backup, err := bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(backup).NotTo(BeNil())
 				Expect(backup.GetTaskId()).NotTo(BeEmpty())
@@ -554,7 +555,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusReq = &api.SdkCloudBackupStatusRequest{
 						VolumeId: volID,
 					}
-					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
+					bkpStatusResp, err := bc.Status(setContextWithToken(context.Background(), users["admin"]), bkpStatusReq)
 					Expect(err).To(BeNil())
 
 					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
@@ -573,7 +574,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("checking the catalog")
 				catalogResp, err := bc.Catalog(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupCatalogRequest{
 						BackupId:     getBackupId(bc, clusterID, volID, credID),
 						CredentialId: credID,
@@ -589,7 +590,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Getting the cluster id of the cluster")
 
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -603,7 +604,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				catalogResp, err := bc.Catalog(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupCatalogRequest{
 						BackupId:     "dummy-backupid",
 						CredentialId: credID,
@@ -622,7 +623,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Getting the cluster id of the cluster")
 
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -636,7 +637,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				catalogResp, err := bc.Catalog(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupCatalogRequest{
 						BackupId:     "",
 						CredentialId: credID,
@@ -658,7 +659,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Getting the cluster id of the cluster")
 
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -676,7 +677,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -692,7 +693,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				backup, err := bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(backup).NotTo(BeNil())
 				Expect(backup.GetTaskId()).NotTo(BeEmpty())
@@ -704,7 +705,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusReq = &api.SdkCloudBackupStatusRequest{
 						VolumeId: volID,
 					}
-					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
+					bkpStatusResp, err := bc.Status(setContextWithToken(context.Background(), users["admin"]), bkpStatusReq)
 					Expect(err).To(BeNil())
 
 					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
@@ -729,7 +730,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			time.Sleep(5 * time.Second)
 
 			historyResp, err := bc.History(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkCloudBackupHistoryRequest{
 					SrcVolumeId: volID,
 				},
@@ -744,7 +745,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 		// 	By("Getting cloud backup history of the created volume")
 		// 	_, err := bc.History(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkCloudBackupHistoryRequest{
 		// 			SrcVolumeId: volID,
 		// 		},
@@ -759,7 +760,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 			By("Getting cloud backup history of the created volume")
 			_, err := bc.History(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkCloudBackupHistoryRequest{
 					SrcVolumeId: volID,
 				},
@@ -777,7 +778,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Getting the cluster id of the cluster")
 
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -787,7 +788,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Getting the node id")
 
 			nodeResp, err := nc.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkNodeInspectCurrentRequest{},
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -804,7 +805,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -820,7 +821,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				backup, err := bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(backup).NotTo(BeNil())
 				Expect(backup.GetTaskId()).NotTo(BeEmpty())
@@ -832,7 +833,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusReq = &api.SdkCloudBackupStatusRequest{
 						VolumeId: volID,
 					}
-					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
+					bkpStatusResp, err := bc.Status(setContextWithToken(context.Background(), users["admin"]), bkpStatusReq)
 					Expect(err).To(BeNil())
 
 					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
@@ -853,7 +854,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Doing restore of the cloud backup")
 				restoreResp, err := bc.Restore(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupRestoreRequest{
 						BackupId:          getBackupId(bc, clusterID, volID, credID),
 						CredentialId:      credID,
@@ -868,7 +869,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				By("Inspecting the restored volume")
 
 				inspectResp, err := vc.Inspect(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeInspectRequest{
 						VolumeId: restoreResp.RestoreVolumeId,
 					},
@@ -887,7 +888,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Getting the cluster id of the cluster")
 
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -905,7 +906,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -921,7 +922,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				backup, err := bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(backup).NotTo(BeNil())
 				Expect(backup.GetTaskId()).NotTo(BeEmpty())
@@ -933,7 +934,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusReq = &api.SdkCloudBackupStatusRequest{
 						VolumeId: volID,
 					}
-					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
+					bkpStatusResp, err := bc.Status(setContextWithToken(context.Background(), users["admin"]), bkpStatusReq)
 					Expect(err).To(BeNil())
 
 					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
@@ -953,7 +954,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				Expect(bkpStatus.Status).To(BeEquivalentTo(api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone))
 
 				_, err = bc.Delete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupDeleteRequest{
 						BackupId:     getBackupId(bc, clusterID, volID, credID),
 						CredentialId: credID,
@@ -976,7 +977,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 		// 		credID = uuid
 
 		// 		_, err := bc.Delete(
-		// 			context.Background(),
+		// 			setContextWithToken(context.Background(), users["admin"]),
 		// 			&api.SdkCloudBackupDeleteRequest{
 		// 				BackupId:     "doesnt-exist",
 		// 				CredentialId: credID,
@@ -1000,7 +1001,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				_, err := bc.Delete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupDeleteRequest{
 						BackupId:     "",
 						CredentialId: credID,
@@ -1023,7 +1024,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 			By("Getting the cluster id of the cluster")
 
 			inpectResp, err := c.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkClusterInspectCurrentRequest{},
 			)
 
@@ -1041,7 +1042,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -1057,7 +1058,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					Full:         false,
 				}
 
-				backup, err := bc.Create(context.Background(), backupReq)
+				backup, err := bc.Create(setContextWithToken(context.Background(), users["admin"]), backupReq)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(backup).NotTo(BeNil())
 				Expect(backup.GetTaskId()).NotTo(BeEmpty())
@@ -1069,7 +1070,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 					bkpStatusReq = &api.SdkCloudBackupStatusRequest{
 						VolumeId: volID,
 					}
-					bkpStatusResp, err := bc.Status(context.Background(), bkpStatusReq)
+					bkpStatusResp, err := bc.Status(setContextWithToken(context.Background(), users["admin"]), bkpStatusReq)
 					Expect(err).To(BeNil())
 
 					bkpStatus = bkpStatusResp.Statuses[backup.TaskId]
@@ -1089,7 +1090,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				Expect(bkpStatus.Status).To(BeEquivalentTo(api.SdkCloudBackupStatusType_SdkCloudBackupStatusTypeDone))
 
 				_, err = bc.DeleteAll(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupDeleteAllRequest{
 						SrcVolumeId:  volID,
 						CredentialId: credID,
@@ -1112,7 +1113,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 		// 		credID = uuid
 
 		// 		_, err := bc.DeleteAll(
-		// 			context.Background(),
+		// 			setContextWithToken(context.Background(), users["admin"]),
 		// 			&api.SdkCloudBackupDeleteAllRequest{
 		// 				SrcVolumeId:     "doesnt-exist",
 		// 				CredentialId: credID,
@@ -1136,7 +1137,7 @@ var _ = Describe("Cloud backup [OpenStorageCluster]", func() {
 				credID = uuid
 
 				_, err := bc.DeleteAll(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupDeleteAllRequest{
 						SrcVolumeId:  "",
 						CredentialId: credID,

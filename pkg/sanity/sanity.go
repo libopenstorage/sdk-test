@@ -36,6 +36,7 @@ var (
 	config *SanityConfiguration
 	conn   *grpc.ClientConn
 	lock   sync.Mutex
+	users  map[string]string
 )
 
 // CloudProviderConfig struct for cloud providers configuration
@@ -48,6 +49,8 @@ type CloudProviderConfig struct {
 type SanityConfiguration struct {
 	Address        string
 	MountPath      string
+	SharedSecret   string
+	Issuer         string
 	ProviderConfig *CloudProviderConfig
 }
 
@@ -67,6 +70,8 @@ var _ = BeforeSuite(func() {
 	By("connecting to OpenStorage SDK endpoint")
 	conn, err = connect(config.Address)
 	Expect(err).NotTo(HaveOccurred())
+	By("creating users")
+	users = createUsersTokens()
 })
 
 var _ = AfterSuite(func() {

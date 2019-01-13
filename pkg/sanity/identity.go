@@ -38,7 +38,7 @@ var _ = Describe("Identity Service", func() {
 
 	Describe("Version", func() {
 		It("should return version information", func() {
-			res, err := c.Version(context.Background(), &api.SdkIdentityVersionRequest{})
+			res, err := c.Version(setContextWithToken(context.Background(), users["admin"]), &api.SdkIdentityVersionRequest{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res).NotTo(BeNil())
 			Expect(res.GetSdkVersion()).NotTo(BeNil())
@@ -65,7 +65,7 @@ var _ = Describe("Identity Service", func() {
 	Describe("Capabilities", func() {
 		It("should return appropriate capabilities", func() {
 			req := &api.SdkIdentityCapabilitiesRequest{}
-			res, err := c.Capabilities(context.Background(), req)
+			res, err := c.Capabilities(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res).NotTo(BeNil())
 
