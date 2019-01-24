@@ -54,10 +54,10 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 	})
 	AfterEach(func() {
 		if volID != "" {
-			_, err := volClient.Delete(
-				context.Background(),
-				&api.SdkVolumeDeleteRequest{VolumeId: volID},
-			)
+			err := deleteVol(
+				setContextWithToken(context.Background(), users["admin"]),
+				volClient,
+				volID)
 			Expect(err).NotTo(HaveOccurred())
 		}
 	})
@@ -76,7 +76,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			volResp, err := volClient.Create(context.Background(), volReq)
+			volResp, err := volClient.Create(setContextWithToken(context.Background(), users["admin"]), volReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(volResp).NotTo(BeNil())
 			Expect(volResp.VolumeId).NotTo(BeEmpty())
@@ -86,7 +86,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 			objReq := &api.SdkObjectstoreCreateRequest{
 				VolumeId: volID}
 
-			objResp, err := objClient.Create(context.Background(), objReq)
+			objResp, err := objClient.Create(setContextWithToken(context.Background(), users["admin"]), objReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(objResp).NotTo(BeNil())
 			Expect(objResp.GetObjectstoreStatus().GetVolumeId()).NotTo(BeEmpty())
@@ -107,7 +107,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			volResp, err := volClient.Create(context.Background(), volReq)
+			volResp, err := volClient.Create(setContextWithToken(context.Background(), users["admin"]), volReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(volResp).NotTo(BeNil())
 			Expect(volResp.VolumeId).NotTo(BeEmpty())
@@ -117,7 +117,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 			objReq := &api.SdkObjectstoreCreateRequest{
 				VolumeId: ""}
 
-			objResp, err := objClient.Create(context.Background(), objReq)
+			objResp, err := objClient.Create(setContextWithToken(context.Background(), users["admin"]), objReq)
 			Expect(err).To(HaveOccurred())
 			Expect(objResp).To(BeNil())
 
@@ -141,7 +141,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			volResp, err := volClient.Create(context.Background(), volReq)
+			volResp, err := volClient.Create(setContextWithToken(context.Background(), users["admin"]), volReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(volResp).NotTo(BeNil())
 			Expect(volResp.VolumeId).NotTo(BeEmpty())
@@ -151,7 +151,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 			objReq := &api.SdkObjectstoreCreateRequest{
 				VolumeId: volID}
 
-			objResp, err := objClient.Create(context.Background(), objReq)
+			objResp, err := objClient.Create(setContextWithToken(context.Background(), users["admin"]), objReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(objResp).NotTo(BeNil())
 			Expect(objResp.GetObjectstoreStatus().GetVolumeId()).NotTo(BeEmpty())
@@ -165,14 +165,14 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 				Enable:        true,
 			}
 
-			_, err = objClient.Update(context.Background(), updateReq)
+			_, err = objClient.Update(setContextWithToken(context.Background(), users["admin"]), updateReq)
 			Expect(err).NotTo(HaveOccurred())
 
 			inspectReq := &api.SdkObjectstoreInspectRequest{
 				ObjectstoreId: objResp.GetObjectstoreStatus().GetUuid(),
 			}
 
-			inspectResp, err := objClient.Inspect(context.Background(), inspectReq)
+			inspectResp, err := objClient.Inspect(setContextWithToken(context.Background(), users["admin"]), inspectReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResp).NotTo(BeNil())
 			Expect(inspectResp.GetObjectstoreStatus().GetUuid()).NotTo(BeEmpty())
@@ -196,7 +196,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			volResp, err := volClient.Create(context.Background(), volReq)
+			volResp, err := volClient.Create(setContextWithToken(context.Background(), users["admin"]), volReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(volResp).NotTo(BeNil())
 			Expect(volResp.VolumeId).NotTo(BeEmpty())
@@ -206,7 +206,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 			objReq := &api.SdkObjectstoreCreateRequest{
 				VolumeId: volID}
 
-			objResp, err := objClient.Create(context.Background(), objReq)
+			objResp, err := objClient.Create(setContextWithToken(context.Background(), users["admin"]), objReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(objResp).NotTo(BeNil())
 			Expect(objResp.GetObjectstoreStatus().GetVolumeId()).NotTo(BeEmpty())
@@ -218,7 +218,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 				ObjectstoreId: objResp.GetObjectstoreStatus().GetUuid(),
 			}
 
-			_, err = objClient.Delete(context.Background(), deleteReq)
+			_, err = objClient.Delete(setContextWithToken(context.Background(), users["admin"]), deleteReq)
 			Expect(err).NotTo(HaveOccurred())
 
 			inspectReq := &api.SdkObjectstoreInspectRequest{
@@ -226,7 +226,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 			}
 
 			// Inspect should failed for given objectstore
-			inspectResp, err := objClient.Inspect(context.Background(), inspectReq)
+			inspectResp, err := objClient.Inspect(setContextWithToken(context.Background(), users["admin"]), inspectReq)
 			Expect(err).To(HaveOccurred())
 			Expect(inspectResp).To(BeNil())
 		})
@@ -238,7 +238,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 				ObjectstoreId: "invalid",
 			}
 
-			_, err := objClient.Delete(context.Background(), deleteReq)
+			_, err := objClient.Delete(setContextWithToken(context.Background(), users["admin"]), deleteReq)
 			Expect(err).To(HaveOccurred())
 
 			serverError, ok := status.FromError(err)
@@ -262,7 +262,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			volResp, err := volClient.Create(context.Background(), volReq)
+			volResp, err := volClient.Create(setContextWithToken(context.Background(), users["admin"]), volReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(volResp).NotTo(BeNil())
 			Expect(volResp.VolumeId).NotTo(BeEmpty())
@@ -272,7 +272,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 			objReq := &api.SdkObjectstoreCreateRequest{
 				VolumeId: volID}
 
-			objResp, err := objClient.Create(context.Background(), objReq)
+			objResp, err := objClient.Create(setContextWithToken(context.Background(), users["admin"]), objReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(objResp).NotTo(BeNil())
 			Expect(objResp.GetObjectstoreStatus().GetVolumeId()).NotTo(BeEmpty())
@@ -284,7 +284,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 			}
 
 			// Inspect should failed for given objectstore
-			inspectResp, err := objClient.Inspect(context.Background(), inspectReq)
+			inspectResp, err := objClient.Inspect(setContextWithToken(context.Background(), users["admin"]), inspectReq)
 			// verify inspect response with create response
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResp).NotTo(BeNil())
@@ -304,7 +304,7 @@ var _ = Describe("Objectstore Features[OpenStorageObjectstore]", func() {
 				}
 
 				// Inspect should failed for given objectstore
-				inspectResp, err := objClient.Inspect(context.Background(), inspectReq)
+				inspectResp, err := objClient.Inspect(setContextWithToken(context.Background(), users["admin"]), inspectReq)
 				// verify inspect response with create response
 				Expect(err).To(HaveOccurred())
 				Expect(inspectResp).To(BeNil())

@@ -33,7 +33,7 @@ import (
 func numberOfSchedulePoliciesInCluster(c api.OpenStorageSchedulePolicyClient) int {
 
 	resp, err := c.Enumerate(
-		context.Background(),
+		setContextWithToken(context.Background(), users["admin"]),
 		&api.SdkSchedulePolicyEnumerateRequest{},
 	)
 
@@ -86,7 +86,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			if isPolicyCreatedInTestCase {
 
 				resp, err := c.Delete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkSchedulePolicyDeleteRequest{
 						Name: policyName,
 					},
@@ -99,7 +99,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 		It("Should create schedule policy", func() {
 			policyName = "create-test-policy"
 			resp, err := c.Create(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
@@ -128,7 +128,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 
 		It("Should fail to create policy for empty name", func() {
 			resp, err := c.Create(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
@@ -156,7 +156,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 		It("Should fail to create policy if retention less than 0", func() {
 			policyName = "test-policy-retention"
 			resp, err := c.Create(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
@@ -184,7 +184,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 
 		It("Should fail to create policy for nil object", func() {
 			resp, err := c.Create(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name:      policyName,
@@ -217,7 +217,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			By("First create a policy")
 			policyName = "delete-test-policy"
 			resp, err := c.Create(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
@@ -244,7 +244,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			Expect(policiesAfter).To(BeEquivalentTo(policiesBefore + 1))
 
 			deleteResponse, err := c.Delete(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyDeleteRequest{
 					Name: policyName,
 				},
@@ -261,7 +261,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 		// 	policyName = "policy-doesnt-exist"
 
 		// 	resp, err := c.Delete(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkSchedulePolicyDeleteRequest{
 		// 			Name: policyName,
 		// 		},
@@ -277,7 +277,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 		It("Should fail to delete a schedule policy with empty name", func() {
 
 			resp, err := c.Delete(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyDeleteRequest{
 					Name: policyName,
 				},
@@ -314,7 +314,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			if isPolicyCreatedInTestCase {
 
 				resp, err := c.Delete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkSchedulePolicyDeleteRequest{
 						Name: policyName,
 					},
@@ -346,7 +346,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 
 			By("First create a policy")
 			resp, err := c.Create(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				policy,
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -360,7 +360,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			By("Inspecting the created policy")
 
 			inspectResponse, err := c.Inspect(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyInspectRequest{
 					Name: policyName,
 				},
@@ -383,7 +383,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 		// 	policyName = "policy-doesnt-exist"
 
 		// 	resp, err := c.Delete(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkSchedulePolicyDeleteRequest{
 		// 			Name: policyName,
 		// 		},
@@ -399,7 +399,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 		It("Should fail to inspect a policy of empty name", func() {
 
 			resp, err := c.Delete(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyDeleteRequest{
 					Name: policyName,
 				},
@@ -439,7 +439,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				for _, policyName := range policyNames {
 
 					resp, err := c.Delete(
-						context.Background(),
+						setContextWithToken(context.Background(), users["admin"]),
 						&api.SdkSchedulePolicyDeleteRequest{
 							Name: policyName,
 						},
@@ -456,7 +456,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			for i := 0; i < count; i++ {
 				policyName := "test-policy" + strconv.Itoa(i)
 				resp, err := c.Create(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkSchedulePolicyCreateRequest{
 						SchedulePolicy: &api.SdkSchedulePolicy{
 							Name: policyName,
@@ -487,7 +487,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			By("Enumerating all the policies in the cluster")
 
 			enumerateResponse, err := c.Enumerate(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyEnumerateRequest{},
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -498,7 +498,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 
 			if policiesBefore == 0 {
 				resp, err := c.Enumerate(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkSchedulePolicyEnumerateRequest{},
 				)
 
@@ -532,7 +532,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			if isPolicyCreatedInTestCase {
 
 				resp, err := c.Delete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkSchedulePolicyDeleteRequest{
 						Name: policyName,
 					},
@@ -547,7 +547,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			By("Creating a schedule policy first")
 			policyName = "update-test-policy"
 			resp, err := c.Create(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
@@ -593,7 +593,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				},
 			}
 			updateResponse, err := c.Update(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				update,
 			)
 
@@ -602,7 +602,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 
 			By("Inspecting the updated schedule policy")
 			inspectResponse, err := c.Inspect(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyInspectRequest{
 					Name: policyName,
 				},
@@ -630,7 +630,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 			By("Creating a schedule policy first")
 			policyName = "fail-test-policy-update"
 			resp, err := c.Create(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkSchedulePolicyCreateRequest{
 					SchedulePolicy: &api.SdkSchedulePolicy{
 						Name: policyName,
@@ -676,7 +676,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				},
 			}
 			updateResponse, err := c.Update(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				update,
 			)
 
@@ -708,7 +708,7 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 				},
 			}
 			updateResponse, err := c.Update(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				update,
 			)
 			Expect(err).To(HaveOccurred())

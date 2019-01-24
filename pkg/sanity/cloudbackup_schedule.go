@@ -72,7 +72,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				credID = uuid
 
 				cc.Delete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCredentialDeleteRequest{
 						CredentialId: credID,
 					},
@@ -82,17 +82,17 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 
 		if volID != "" {
 			_, err := ma.Detach(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeDetachRequest{
 					VolumeId: volID,
-					Options: &api.SdkVolumeDetachRequest_Options{
+					Options: &api.SdkVolumeDetachOptions{
 						UnmountBeforeDetach: true,
 					},
 				},
 			)
 			Expect(err).NotTo(HaveOccurred())
 			_, err = vc.Delete(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeDeleteRequest{VolumeId: volID},
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -113,7 +113,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -136,7 +136,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				}
 
 				schedCreateResp, err := bc.SchedCreate(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupSchedCreateRequest{
 						CloudSchedInfo: &api.SdkCloudBackupScheduleInfo{
 							CredentialId: credID,
@@ -152,7 +152,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 
 				By("Deleting the schedule")
 				_, err = bc.SchedDelete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupSchedDeleteRequest{
 						BackupScheduleId: schedCreateResp.BackupScheduleId,
 					},
@@ -183,7 +183,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				}
 
 				schedCreateResp, err := bc.SchedCreate(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupSchedCreateRequest{
 						CloudSchedInfo: &api.SdkCloudBackupScheduleInfo{
 							CredentialId: credID,
@@ -199,7 +199,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 
 				serverError, ok := status.FromError(err)
 				Expect(ok).To(BeTrue())
-				Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
+				Expect(serverError.Code()).To(BeEquivalentTo(codes.NotFound))
 			}
 		})
 
@@ -225,7 +225,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				}
 
 				schedCreateResp, err := bc.SchedCreate(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupSchedCreateRequest{
 						CloudSchedInfo: &api.SdkCloudBackupScheduleInfo{
 							CredentialId: credID,
@@ -240,7 +240,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 
 				serverError, ok := status.FromError(err)
 				Expect(ok).To(BeTrue())
-				Expect(serverError.Code()).To(BeEquivalentTo(codes.InvalidArgument))
+				Expect(serverError.Code()).To(BeEquivalentTo(codes.NotFound))
 			}
 		})
 
@@ -266,7 +266,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				}
 
 				schedCreateResp, err := bc.SchedCreate(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupSchedCreateRequest{
 						CloudSchedInfo: &api.SdkCloudBackupScheduleInfo{
 							CredentialId: credID,
@@ -301,7 +301,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -324,7 +324,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				}
 
 				schedCreateResp, err := bc.SchedCreate(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupSchedCreateRequest{
 						CloudSchedInfo: &api.SdkCloudBackupScheduleInfo{
 							CredentialId: credID,
@@ -340,7 +340,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 			}
 
 			enumResp, err := bc.SchedEnumerate(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkCloudBackupSchedEnumerateRequest{},
 			)
 
@@ -363,7 +363,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 
 				By("Attaching the created volume")
 				str, err := ma.Attach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeAttachRequest{
 						VolumeId: volID,
 					},
@@ -386,7 +386,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				}
 
 				schedCreateResp, err := bc.SchedCreate(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupSchedCreateRequest{
 						CloudSchedInfo: &api.SdkCloudBackupScheduleInfo{
 							CredentialId: credID,
@@ -401,7 +401,7 @@ var _ = Describe("Cloud backup schedule [OpenStorageCluster]", func() {
 				Expect(schedCreateResp.BackupScheduleId).NotTo(BeNil())
 
 				_, err = bc.SchedDelete(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkCloudBackupSchedDeleteRequest{
 						BackupScheduleId: schedCreateResp.BackupScheduleId,
 					},

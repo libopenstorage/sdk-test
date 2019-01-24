@@ -22,6 +22,9 @@ import (
 	"time"
 
 	api "github.com/libopenstorage/openstorage-sdk-clients/sdk/golang"
+	"github.com/libopenstorage/sdk-test/pkg/auth"
+	"google.golang.org/grpc/metadata"
+
 	. "github.com/onsi/gomega"
 )
 
@@ -32,6 +35,79 @@ const (
 	GIGABYTE
 	TERABYTE
 )
+
+func createUsersTokens() map[string]string {
+
+	users := make(map[string]string)
+
+	// user1
+	user1 := createToken(&auth.Claims{
+		Subject: "user1",
+		Name:    "user1",
+		Email:   "user1@user",
+		Roles:   []string{"system.user"},
+		Groups:  []string{"users"},
+	}, &auth.Options{
+		Expiration: time.Now().Add(1 * time.Hour).Unix(),
+	}, config.SharedSecret)
+	users["user1"] = user1
+
+	// user1
+	user2 := createToken(&auth.Claims{
+		Subject: "user2",
+		Name:    "user2",
+		Email:   "user2@user",
+		Roles:   []string{"system.user"},
+		Groups:  []string{"users"},
+	}, &auth.Options{
+		Expiration: time.Now().Add(1 * time.Hour).Unix(),
+	}, config.SharedSecret)
+	users["user2"] = user2
+
+	// user1
+	user3 := createToken(&auth.Claims{
+		Subject: "user3",
+		Name:    "user3",
+		Email:   "user3@user",
+		Roles:   []string{"system.user"},
+		Groups:  []string{"users", "testers"},
+	}, &auth.Options{
+		Expiration: time.Now().Add(1 * time.Hour).Unix(),
+	}, config.SharedSecret)
+	users["user3"] = user3
+
+	// admin
+	admin := createToken(&auth.Claims{
+		Subject: "admin",
+		Name:    "admin",
+		Email:   "admin@user",
+		Roles:   []string{"system.admin"},
+		Groups:  []string{"*"},
+	}, &auth.Options{
+		Expiration: time.Now().Add(1 * time.Hour).Unix(),
+	}, config.SharedSecret)
+	users["admin"] = admin
+
+	// expired
+	expired := createToken(&auth.Claims{
+		Subject: "expired",
+		Name:    "expired",
+		Email:   "expired@user",
+		Roles:   []string{"system.view"},
+	}, &auth.Options{
+		Expiration: time.Now().Add(-1 * time.Hour).Unix(),
+	}, config.SharedSecret)
+	users["expired"] = expired
+
+	return users
+}
+
+func setContextWithToken(ctx context.Context, token string) context.Context {
+	md := metadata.New(map[string]string{
+		"authorization": "bearer " + token,
+	})
+	return metadata.NewOutgoingContext(ctx, md)
+}
 
 func testVolumeDetails(
 	req *api.SdkVolumeCreateRequest,
@@ -95,7 +171,7 @@ func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int 
 				},
 			}
 
-			credResp, err := credClient.Create(context.Background(), credReq)
+			credResp, err := credClient.Create(setContextWithToken(context.Background(), users["admin"]), credReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
 			numCredCreated++
@@ -111,7 +187,7 @@ func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int 
 				},
 			}
 
-			credResp, err := credClient.Create(context.Background(), credReq)
+			credResp, err := credClient.Create(setContextWithToken(context.Background(), users["admin"]), credReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
 			numCredCreated++
@@ -127,7 +203,7 @@ func parseAndCreateCredentials(credClient api.OpenStorageCredentialsClient) int 
 				},
 			}
 
-			credResp, err := credClient.Create(context.Background(), credReq)
+			credResp, err := credClient.Create(setContextWithToken(context.Background(), users["admin"]), credReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
 			numCredCreated++
@@ -148,7 +224,7 @@ func newTestVolume(volClient api.OpenStorageVolumeClient) string {
 			Format:    api.FSType_FS_TYPE_XFS,
 		},
 	}
-	volResp, err := volClient.Create(context.Background(), volReq)
+	volResp, err := volClient.Create(setContextWithToken(context.Background(), users["admin"]), volReq)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(volResp).NotTo(BeNil())
 	Expect(volResp.VolumeId).NotTo(BeEmpty())
@@ -169,7 +245,7 @@ func newTestCredential(credClient api.OpenStorageCredentialsClient) string {
 		},
 	}
 
-	credResp, err := credClient.Create(context.Background(), credReq)
+	credResp, err := credClient.Create(setContextWithToken(context.Background(), users["admin"]), credReq)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
 	return credResp.GetCredentialId()
@@ -194,7 +270,7 @@ func parseAndCreateCredentials2(credClient api.OpenStorageCredentialsClient) map
 				},
 			}
 
-			credResp, err := credClient.Create(context.Background(), credReq)
+			credResp, err := credClient.Create(setContextWithToken(context.Background(), users["admin"]), credReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
 			credMap["aws"] = credResp.GetCredentialId()
@@ -209,7 +285,7 @@ func parseAndCreateCredentials2(credClient api.OpenStorageCredentialsClient) map
 					},
 				},
 			}
-			credResp, err := credClient.Create(context.Background(), credReq)
+			credResp, err := credClient.Create(setContextWithToken(context.Background(), users["admin"]), credReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
 			credMap["azure"] = credResp.GetCredentialId()
@@ -225,7 +301,7 @@ func parseAndCreateCredentials2(credClient api.OpenStorageCredentialsClient) map
 				},
 			}
 
-			credResp, err := credClient.Create(context.Background(), credReq)
+			credResp, err := credClient.Create(setContextWithToken(context.Background(), users["admin"]), credReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(credResp.GetCredentialId()).NotTo(BeEmpty())
 			credMap["google"] = credResp.GetCredentialId()
@@ -239,7 +315,7 @@ func isCapabilitySupported(c api.OpenStorageIdentityClient,
 ) bool {
 
 	caps, err := c.Capabilities(
-		context.Background(),
+		setContextWithToken(context.Background(), users["admin"]),
 		&api.SdkIdentityCapabilitiesRequest{})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(caps).NotTo(BeNil())
@@ -252,4 +328,70 @@ func isCapabilitySupported(c api.OpenStorageIdentityClient,
 		}
 	}
 	return false
+}
+
+func createToken(claims *auth.Claims, options *auth.Options, sharedSecret string) string {
+
+	if len(claims.Issuer) == 0 {
+		claims.Issuer = config.Issuer
+	}
+
+	// This never fails
+	signature, _ := auth.NewSignatureSharedSecret(sharedSecret)
+
+	token, err := auth.Token(claims, signature, options)
+	Expect(err).NotTo(HaveOccurred())
+
+	return token
+}
+
+// f() return <wait as bool, or err>.
+// waitFor stops when f() return (false) or err != nil
+func waitFor(timeout time.Duration, period time.Duration, f func() (bool, error)) error {
+	timeoutChan := time.After(timeout)
+	var (
+		wait bool
+		err  error
+	)
+	for wait {
+		select {
+		case <-timeoutChan:
+			return fmt.Errorf("Timed out")
+		default:
+			wait, err = f()
+			if err != nil {
+				return err
+			}
+			time.Sleep(period)
+		}
+	}
+
+	return nil
+}
+
+func deleteVol(ctx context.Context, vc api.OpenStorageVolumeClient, volid string) error {
+	err := waitFor(5*time.Minute, time.Second, func() (bool, error) {
+		respInspectVol, err := vc.Inspect(
+			ctx,
+			&api.SdkVolumeInspectRequest{
+				VolumeId: volid,
+			})
+		if err != nil {
+			return false, err
+		}
+		if len(respInspectVol.GetVolume().GetAttachedOn()) == 0 {
+			return false, nil
+		}
+		return true, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = vc.Delete(
+		ctx,
+		&api.SdkVolumeDeleteRequest{
+			VolumeId: volid,
+		})
+	return err
 }

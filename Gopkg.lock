@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  branch = "master"
+  digest = "1:5771b86b64a5e64d8e3d70337813686586210131ac4fb4c6a97b43c8e25e2253"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3af4c746e1c248ee8491a3e0c6f7a9cd831e95f8"
+
+[[projects]]
   digest = "1:0a7ddae0f9b0357691225e6048e0d4ea0253d94f3f951808df3e0ad556051433"
   name = "github.com/golang/protobuf"
   packages = [
@@ -46,11 +54,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3da89dff6c69c39db5ef586a3b44840e964776718d632a10d2565f11693adc25"
+  digest = "1:8bcba8686ee1c7c47a5d2db71bd151cad497996a362deb90904be42a94ca3634"
   name = "github.com/libopenstorage/openstorage-sdk-clients"
   packages = ["sdk/golang"]
   pruneopts = "UT"
-  revision = "f8bafe59308d7b9187d8d448d571e16eef566c07"
+  revision = "bae7b0b276cf7fcd2293baad76bb68ab5c73ab69"
 
 [[projects]]
   digest = "1:42e29deef12327a69123b9cb2cb45fee4af5c12c2a23c6e477338279a052703f"
@@ -235,12 +243,14 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/dgrijalva/jwt-go",
     "github.com/libopenstorage/openstorage-sdk-clients/sdk/golang",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
     "google.golang.org/grpc/connectivity",
+    "google.golang.org/grpc/metadata",
     "google.golang.org/grpc/status",
     "gopkg.in/yaml.v2",
   ]

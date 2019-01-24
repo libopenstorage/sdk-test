@@ -57,16 +57,16 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 
 	AfterEach(func() {
 		if volID != "" {
-			_, err := v.Delete(
-				context.Background(),
-				&api.SdkVolumeDeleteRequest{VolumeId: volID},
-			)
+			err := deleteVol(
+				setContextWithToken(context.Background(), users["admin"]),
+				v,
+				volID)
 			Expect(err).NotTo(HaveOccurred())
 		}
 	})
 
 	It("should return a cluster id", func() {
-		info, err := c.InspectCurrent(context.Background(),
+		info, err := c.InspectCurrent(setContextWithToken(context.Background(), users["admin"]),
 			&api.SdkClusterInspectCurrentRequest{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(info.Cluster).NotTo(BeNil())
@@ -77,7 +77,7 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 		It("Should successfully enumerate nodes", func() {
 
 			enumResp, err := n.Enumerate(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkNodeEnumerateRequest{},
 			)
 
@@ -91,7 +91,7 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 		It("Should inspect all the nodes Successfully", func() {
 			By("Enumerating the nodes and getting the node id")
 			enumResp, err := n.Enumerate(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkNodeEnumerateRequest{},
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -100,7 +100,7 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 			for _, nodeID := range enumResp.NodeIds {
 
 				inspectResp, err := n.Inspect(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkNodeInspectRequest{
 						NodeId: nodeID,
 					},
@@ -115,7 +115,7 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 		It("Should fail to inspect a a non-existent node id", func() {
 
 			inspectResp, err := n.Inspect(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkNodeInspectRequest{
 					NodeId: "node-id-doesnt-exist",
 				},
@@ -130,7 +130,7 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 
 		It("Should fail to inspect an empty node id", func() {
 			inspectResp, err := n.Inspect(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkNodeInspectRequest{
 					NodeId: "",
 				},
@@ -147,7 +147,7 @@ var _ = Describe("Cluster [OpenStorageCluster]", func() {
 	Describe("Node InspectCurrent", func() {
 		It("Should inspect the current node successfully", func() {
 			resp, err := n.InspectCurrent(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkNodeInspectCurrentRequest{},
 			)
 

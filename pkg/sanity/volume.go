@@ -63,11 +63,11 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 
 		AfterEach(func() {
-			if volID != "" {
-				_, err := c.Delete(
-					context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: volID},
-				)
+			if len(volID) != 0 {
+				err := deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
@@ -85,7 +85,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -95,7 +95,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			inspectReq := &api.SdkVolumeInspectRequest{
 				VolumeId: createResponse.VolumeId,
 			}
-			inspectResponse, err := c.Inspect(context.Background(), inspectReq)
+			inspectResponse, err := c.Inspect(setContextWithToken(context.Background(), users["admin"]), inspectReq)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(inspectResponse).NotTo(BeNil())
 
@@ -110,7 +110,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					Size: uint64(5 * GIGABYTE),
 				},
 			}
-			info, err := c.Create(context.Background(), req)
+			info, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(info).To(BeNil())
 			Expect(err).To(HaveOccurred())
 
@@ -126,7 +126,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					Size: uint64(0 * GIGABYTE),
 				},
 			}
-			info, err := c.Create(context.Background(), req)
+			info, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(info).To(BeNil())
 
 			Expect(err).To(HaveOccurred())
@@ -148,12 +148,12 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 			Size: uint64(5 * GIGABYTE),
 		// 		},
 		// 	}
-		// 	info, err := c.Create(context.Background(), req)
+		// 	info, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 		// 	Expect(err).NotTo(HaveOccurred())
 		// 	Expect(info.VolumeId).NotTo(BeEmpty())
 
 		// 	By("Creating a volume with existing volume name")
-		// 	info, err = c.Create(context.Background(), req)
+		// 	info, err = c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 
 		// 	Expect(err).To(HaveOccurred())
 		// 	Expect(info.VolumeId).To(BeEmpty())
@@ -174,11 +174,11 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 
 		AfterEach(func() {
-			if volID != "" {
-				_, err := c.Delete(
-					context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: volID},
-				)
+			if len(volID) != 0 {
+				err := deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
@@ -193,7 +193,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					HaLevel: 2,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -201,7 +201,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Inspecting the created volume")
 			resp, err := c.Inspect(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeInspectRequest{
 					VolumeId: volID,
 				},
@@ -219,7 +219,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 	// 	By("Using a volume id that doesn't exist")
 
 	// 	resp, err := c.Inspect(
-	// 		context.Background(),
+	// 		setContextWithToken(context.Background(), users["admin"]),
 	// 		&api.SdkVolumeInspectRequest{
 	// 			VolumeId: "junk-id-doesnt-exist",
 	// 		},
@@ -251,7 +251,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					HaLevel: 3,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -259,7 +259,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 			By("Deleting the created volume")
 			_, err = c.Delete(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeDeleteRequest{
 					VolumeId: volID,
 				},
@@ -274,7 +274,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// It("Should throw a error for deleting a non-existent volume", func() {
 
 		// 	_, err := c.Delete(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeDeleteRequest{
 		// 			VolumeId: "dummy-id",
 		// 		},
@@ -290,7 +290,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		It("Should throw a error for passing empty volume id", func() {
 
 			_, err := c.Delete(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeDeleteRequest{
 					VolumeId: "",
 				},
@@ -314,10 +314,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		AfterEach(func() {
 			for _, id := range volIDs {
-				_, err := c.Delete(
-					context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: id},
-				)
+				err := deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					id)
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
@@ -335,7 +335,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 				},
 		// 			},
 		// 		}
-		// 		createResponse, err := c.Create(context.Background(), req)
+		// 		createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 		// 		Expect(err).NotTo(HaveOccurred())
 		// 		Expect(createResponse).NotTo(BeNil())
 		// 		Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -355,7 +355,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 				},
 		// 			},
 		// 		}
-		// 		createResponse, err := c.Create(context.Background(), req)
+		// 		createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 		// 		Expect(err).NotTo(HaveOccurred())
 		// 		Expect(createResponse).NotTo(BeNil())
 		// 		Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -366,7 +366,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	By("Enumerating the volumes that match the label")
 
 		// 	resp, err := c.Enumerate(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeEnumerateRequest{
 		// 			Locator: &api.VolumeLocator{
 		// 				VolumeLabels: map[string]string{
@@ -383,7 +383,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	By("Enumerating all the volumes in the cluster")
 
 		// 	resp, err = c.Enumerate(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeEnumerateRequest{
 		// 			Locator: &api.VolumeLocator{
 		// 				VolumeLabels: map[string]string{},
@@ -397,7 +397,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// })
 
 		It("Should throw appropriate error when failed to enumerate", func() {
-			_, err := c.Enumerate(context.Background(), nil)
+			_, err := c.Enumerate(setContextWithToken(context.Background(), users["admin"]), nil)
 			Expect(err).To(HaveOccurred())
 			serverError, ok := status.FromError(err)
 			Expect(ok).To(BeTrue())
@@ -420,21 +420,20 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				// Detach the attached Volume
 				// before deleting
 				detachResponse, err := ma.Detach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeDetachRequest{
 						VolumeId: volID,
-						Options: &api.SdkVolumeDetachRequest_Options{
+						Options: &api.SdkVolumeDetachOptions{
 							UnmountBeforeDetach: true,
 						},
 					},
 				)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(detachResponse).NotTo(BeNil())
-
-				_, err = c.Delete(
-					context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: volID},
-				)
+				err = deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
@@ -449,7 +448,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					HaLevel: 1,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -458,7 +457,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Attaching the created Volume")
 
 			resp, err := ma.Attach(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeAttachRequest{
 					VolumeId: volID,
 				},
@@ -476,7 +475,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	By("Passing a non-existent volume id for Attach")
 
 		// 	resp, err := ma.Attach(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeAttachRequest{
 		// 			VolumeId: "attach-doesnt-exist",
 		// 		},
@@ -494,7 +493,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Passing a empty volume id for Attach")
 
 			resp, err := ma.Attach(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeAttachRequest{
 					VolumeId: "",
 				},
@@ -520,10 +519,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 		AfterEach(func() {
 			if volID != "" {
-				_, err := c.Delete(
-					context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: volID},
-				)
+				err := deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
@@ -538,7 +537,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					HaLevel: 3,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -547,7 +546,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Attaching the created Volume")
 
 			resp, err := ma.Attach(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeAttachRequest{
 					VolumeId: volID,
 				},
@@ -559,10 +558,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Detaching the attached volume")
 
 			detachResponse, err := ma.Detach(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeDetachRequest{
 					VolumeId: volID,
-					Options: &api.SdkVolumeDetachRequest_Options{
+					Options: &api.SdkVolumeDetachOptions{
 						UnmountBeforeDetach: true,
 					},
 				},
@@ -583,7 +582,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 			Size: uint64(5 * GIGABYTE),
 		// 		},
 		// 	}
-		// 	createResponse, err := c.Create(context.Background(), req)
+		// 	createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 		// 	Expect(err).NotTo(HaveOccurred())
 		// 	Expect(createResponse).NotTo(BeNil())
 		// 	Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -592,7 +591,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	By("Detaching a non-attached volume")
 
 		// 	_, err = ma.Detach(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeDetachRequest{
 		// 			VolumeId: volID,
 		// 		},
@@ -609,7 +608,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	By("Detaching a non-existent volume")
 
 		// 	_, err := ma.Detach(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeDetachRequest{
 		// 			VolumeId: "dummy-doesn't exist",
 		// 		},
@@ -626,10 +625,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Detaching a non-existent volume")
 
 			_, err := ma.Detach(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeDetachRequest{
 					VolumeId: "",
-					Options: &api.SdkVolumeDetachRequest_Options{
+					Options: &api.SdkVolumeDetachOptions{
 						UnmountBeforeDetach: true,
 					},
 				},
@@ -659,7 +658,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				// Unmount the mounted volume first
 				// before deleting
 				unmountResponse, err := ma.Unmount(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeUnmountRequest{
 						VolumeId:  volID,
 						MountPath: config.MountPath,
@@ -670,10 +669,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				// Detach the attached Volume
 				// before deleting
 				detachResponse, err := ma.Detach(
-					context.Background(),
+					setContextWithToken(context.Background(), users["admin"]),
 					&api.SdkVolumeDetachRequest{
 						VolumeId: volID,
-						Options: &api.SdkVolumeDetachRequest_Options{
+						Options: &api.SdkVolumeDetachOptions{
 							UnmountBeforeDetach: true,
 						},
 					},
@@ -681,10 +680,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(detachResponse).NotTo(BeNil())
 
-				_, err = c.Delete(
-					context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: volID},
-				)
+				err = deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
@@ -701,7 +700,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -710,7 +709,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Attaching the created Volume")
 
 			resp, err := ma.Attach(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeAttachRequest{
 					VolumeId: volID,
 				},
@@ -721,7 +720,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Mounting the attached Volume")
 
 			mountResponse, err := ma.Mount(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeMountRequest{
 					VolumeId:  volID,
 					MountPath: config.MountPath,
@@ -743,7 +742,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 			Size: uint64(5 * GIGABYTE),
 		// 		},
 		// 	}
-		// 	createResponse, err := c.Create(context.Background(), req)
+		// 	createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 		// 	Expect(err).NotTo(HaveOccurred())
 		// 	Expect(createResponse).NotTo(BeNil())
 		// 	Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -752,7 +751,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	By("Attaching the created Volume")
 
 		// 	resp, err := ma.Attach(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeAttachRequest{
 		// 			VolumeId: volID,
 		// 		},
@@ -763,7 +762,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	By("Mounting a non-attached Volume")
 
 		// 	_, err = ma.Mount(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeMountRequest{
 		// 			VolumeId:  volID,
 		// 			MountPath: config.MountPath,
@@ -783,7 +782,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 	By("Mounting a non-existent Volume")
 
 		// 	_, err := ma.Mount(
-		// 		context.Background(),
+		// 		setContextWithToken(context.Background(), users["admin"]),
 		// 		&api.SdkVolumeMountRequest{
 		// 			VolumeId:  "dummy-doesnt-exist",
 		// 			MountPath: config.MountPath,
@@ -800,7 +799,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Mounting a Volume with empty id")
 
 			_, err := ma.Mount(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeMountRequest{
 					VolumeId:  "",
 					MountPath: config.MountPath,
@@ -825,18 +824,12 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		})
 
 		AfterEach(func() {
-			if volID != "" {
-				_, err := c.Delete(
-					context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: volID},
-				)
-				Expect(err).NotTo(HaveOccurred())
-
-				if clonedID != "" {
-					_, err = c.Delete(
-						context.Background(),
-						&api.SdkVolumeDeleteRequest{VolumeId: clonedID},
-					)
+			for _, volid := range []string{volID, clonedID} {
+				if len(volid) != 0 {
+					err := deleteVol(
+						setContextWithToken(context.Background(), users["admin"]),
+						c,
+						volid)
 					Expect(err).NotTo(HaveOccurred())
 				}
 			}
@@ -851,7 +844,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					HaLevel: 2,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -860,7 +853,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			By("Cloning the volume")
 
 			cloneRespose, err := c.Clone(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeCloneRequest{
 					Name:     "cloned-vol",
 					ParentId: volID,
@@ -886,7 +879,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 				Size: uint64(5 * GIGABYTE),
 		// 			},
 		// 		}
-		// 		createResponse, err := c.Create(context.Background(), req)
+		// 		createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 		// 		Expect(err).NotTo(HaveOccurred())
 		// 		Expect(createResponse).NotTo(BeNil())
 		// 		Expect(createResponse.VolumeId).NotTo(BeEmpty())
@@ -895,7 +888,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 		// 		By("Cloning the volume")
 
 		// 		cloneRespose, err := c.Clone(
-		// 			context.Background(),
+		// 			setContextWithToken(context.Background(), users["admin"]),
 		// 			&api.SdkVolumeCloneRequest{
 		// 				Name:     "cloned-vol",
 		// 				ParentId: volID,
@@ -925,10 +918,10 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		AfterEach(func() {
 			if volID != "" {
-				_, err := c.Delete(
-					context.Background(),
-					&api.SdkVolumeDeleteRequest{VolumeId: volID},
-				)
+				err := deleteVol(
+					setContextWithToken(context.Background(), users["admin"]),
+					c,
+					volID)
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
@@ -945,14 +938,14 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
 
 			statsResp, err := c.Stats(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeStatsRequest{
 					VolumeId:      volID,
 					NotCumulative: true,
@@ -975,14 +968,14 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 					Format:    api.FSType_FS_TYPE_XFS,
 				},
 			}
-			createResponse, err := c.Create(context.Background(), req)
+			createResponse, err := c.Create(setContextWithToken(context.Background(), users["admin"]), req)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(createResponse).NotTo(BeNil())
 			Expect(createResponse.VolumeId).NotTo(BeEmpty())
 			volID = createResponse.VolumeId
 
 			statsResp, err := c.Stats(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeStatsRequest{
 					VolumeId:      volID,
 					NotCumulative: false,
@@ -997,7 +990,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 			Skip("PWX-6056")
 
 			statsResp, err := c.Stats(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeStatsRequest{
 					VolumeId:      "volID-doesnt-exist",
 					NotCumulative: true,
@@ -1010,7 +1003,7 @@ var _ = Describe("Volume [OpenStorageVolume]", func() {
 
 		It("Should fail to retrieve stats of empty volume", func() {
 			statsResp, err := c.Stats(
-				context.Background(),
+				setContextWithToken(context.Background(), users["admin"]),
 				&api.SdkVolumeStatsRequest{
 					VolumeId:      volID,
 					NotCumulative: true,
