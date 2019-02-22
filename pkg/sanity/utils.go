@@ -350,7 +350,7 @@ func createToken(claims *auth.Claims, options *auth.Options, sharedSecret string
 func waitFor(timeout time.Duration, period time.Duration, f func() (bool, error)) error {
 	timeoutChan := time.After(timeout)
 	var (
-		wait bool
+		wait bool = true
 		err  error
 	)
 	for wait {

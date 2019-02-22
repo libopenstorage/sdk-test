@@ -17,6 +17,7 @@ timeout 30 sh -c 'until curl --silent -X GET -d {} http://localhost:8181/v1/clus
 
 echo ">>> VERSION"
 timeout 30 sh -c 'until curl --silent -X GET -d {} http://localhost:8181/v1/identities/version; do sleep 1; done'
+echo ""
 ./cmd/sdk-test/sdk-test --sdk.endpoint=127.0.0.1:${PORT} --sdk.cpg=./cmd/sdk-test/cb.yaml ; ret=$?
 docker stop ${MOCKSDK} > /dev/null 2>&1
 exit $ret
