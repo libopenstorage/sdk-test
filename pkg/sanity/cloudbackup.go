@@ -272,7 +272,7 @@ var _ = Describe("Cloud backup [OpenStorageClusterBackup]", func() {
 			Expect(err).To(HaveOccurred())
 			serverError, ok := status.FromError(err)
 			Expect(ok).To(BeTrue())
-			Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
+			Expect(serverError.Code()).To(BeEquivalentTo(codes.NotFound))
 		})
 
 		It("Should fail to create back up if empty credentials is passed", func() {
@@ -469,7 +469,7 @@ var _ = Describe("Cloud backup [OpenStorageClusterBackup]", func() {
 
 			serverError, ok := status.FromError(err)
 			Expect(ok).To(BeTrue())
-			Expect(serverError.Code()).To(BeEquivalentTo(codes.Internal))
+			Expect(serverError.Code()).To(BeEquivalentTo(codes.NotFound))
 		})
 
 		It("Should fail to enumerate back up if empty credentials is passed", func() {
