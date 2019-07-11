@@ -26,6 +26,30 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+var _ = Describe("Fun", func() {
+	var (
+		c api.OpenStorageIdentityClient
+	)
+
+	BeforeEach(func() {
+		c = api.NewOpenStorageIdentityClient(conn)
+		fmt.Println("Before called")
+	})
+	AfterEach(func() {
+		fmt.Println("After called")
+	})
+
+	Describe("Get version from storage", func() {
+		It("should return version from the storage", func() {
+			By("getting version from the server")
+			res, err := c.Version(context.Background(), &api.SdkIdentityVersionRequest{})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res).NotTo(BeNil())
+			Expect(res.GetSdkVersion()).NotTo(BeNil())
+		})
+	})
+})
+
 var _ = Describe("Identity Service", func() {
 
 	var (
