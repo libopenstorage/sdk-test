@@ -29,6 +29,7 @@ import (
 	"google.golang.org/grpc/connectivity"
 
 	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
 )
 
@@ -52,6 +53,7 @@ type SanityConfiguration struct {
 	SharedSecret   string
 	Issuer         string
 	ProviderConfig *CloudProviderConfig
+	JUnitFile      string
 }
 
 // Test will test start the sanity tests
@@ -61,7 +63,13 @@ func Test(t *testing.T, reqConfig *SanityConfiguration) {
 
 	config = reqConfig
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "OpenStorage SDK Test Suite")
+	//RunSpecs(t, "OpenStorage SDK Test Suite")
+	var specReporters []Reporter
+	if reqConfig.JUnitFile != "" {
+		junitReporter := reporters.NewJUnitReporter(reqConfig.JUnitFile)
+		specReporters = append(specReporters, junitReporter)
+	}
+	RunSpecsWithDefaultAndCustomReporters(t, "OpenStorage SDK Test Suite", specReporters)
 }
 
 var _ = BeforeSuite(func() {

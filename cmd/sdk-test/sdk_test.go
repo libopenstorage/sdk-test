@@ -37,6 +37,7 @@ var (
 	cloudProviderConfigPath string
 	sharedSecret            string
 	issuer                  string
+	junitfile               string
 )
 
 func init() {
@@ -46,6 +47,7 @@ func init() {
 	flag.StringVar(&cloudProviderConfigPath, prefix+"cpg", "", "Cloud Provider config file , optional")
 	flag.StringVar(&sharedSecret, prefix+"sharedsecret", "", "Shared secret for auth, ownership, and role testing")
 	flag.StringVar(&issuer, prefix+"issuer", "openstorage.io", "Issuer of token")
+	flag.StringVar(&junitfile, prefix+"junitfile", "report.xml", "XML test report")
 	flag.Parse()
 }
 
@@ -78,6 +80,7 @@ func TestSanity(t *testing.T) {
 		SharedSecret:   sharedSecret,
 		Issuer:         issuer,
 		ProviderConfig: cfg,
+		JUnitFile:      junitfile,
 	})
 }
 

@@ -19,10 +19,13 @@ package sanity
 import (
 	"context"
 	"fmt"
+	"strings"
+	"sync"
 	"time"
 
 	api "github.com/libopenstorage/openstorage-sdk-clients/sdk/golang"
-	"github.com/libopenstorage/sdk-test/pkg/auth"
+	auth "github.com/libopenstorage/sdk-test/pkg/auth"
+	common "github.com/libopenstorage/sdk-test/pkg/common"
 	"google.golang.org/grpc/metadata"
 
 	. "github.com/onsi/gomega"
@@ -100,6 +103,33 @@ func createUsersTokens() map[string]string {
 	users["expired"] = expired
 
 	return users
+}
+
+func createXUsersTokens(prefix string, amount int) map[string]string {
+	users := common.NewConcStrToStrMap()
+	if amount <= 0 {
+		return users.GetKeyValMap()
+	}
+	var wg sync.WaitGroup
+	for i := 0; i < amount; i++ {
+		name := fmt.Sprintf("%s%d", prefix, i)
+		wg.Add(1)
+		go func(name string) {
+			defer wg.Done()
+			user := createToken(&auth.Claims{
+				Subject: name,
+				Name:    name,
+				Email:   fmt.Sprintf("%s@portworx.com", name),
+				Roles:   []string{"system.user"},
+				Groups:  []string{"users"},
+			}, &auth.Options{
+				Expiration: time.Now().Add(1 * time.Hour).Unix(),
+			}, config.SharedSecret)
+			users.Add(name, user)
+		}(name)
+	}
+	wg.Wait()
+	return users.GetKeyValMap()
 }
 
 func setContextWithToken(ctx context.Context, token string) context.Context {
@@ -394,4 +424,34 @@ func deleteVol(ctx context.Context, vc api.OpenStorageVolumeClient, volid string
 			VolumeId: volid,
 		})
 	return err
+}
+
+func printVolumeDetails(
+	volume *api.Volume,
+) {
+	fmt.Printf("volume ID: %s\n", volume.Id)
+}
+
+func summarizeErrorsFromStringErrorChanMap(stringErrMap map[string]chan (error)) error {
+	var summarizedErrMsg string
+	for key, errChan := range stringErrMap {
+		err := <-errChan
+		if err != nil {
+			summarizedErrMsg = fmt.Sprintf("%s\nerror of %s: %v", summarizedErrMsg, key, err)
+		}
+	}
+	fmt.Printf("\nsummarizedErrMsg: %s", summarizedErrMsg)
+	if strings.TrimSpace(summarizedErrMsg) == "" {
+		return nil
+	}
+	return fmt.Errorf("%s", summarizedErrMsg)
+}
+
+func getKeyOtherThanInMap(StrStrMap map[string]string, key string) string {
+	for k, _ := range StrStrMap {
+		if k != key {
+			return k
+		}
+	}
+	return ""
 }
