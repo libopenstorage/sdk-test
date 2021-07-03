@@ -18,6 +18,7 @@ package sanity
 
 import (
 	"strconv"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -61,6 +62,226 @@ var _ = Describe("SchedulePolicy [OpenStorageSchedulePolicy]", func() {
 		if !isSupported {
 			Skip("Schedule Policy capability not supported , skipping related tests")
 		}
+	})
+
+	Describe("Schedule Policies with default values", func() {
+		var (
+			policyName                string
+			policiesBefore            int
+			policiesAfter             int
+			isPolicyCreatedInTestCase bool
+		)
+
+		const (
+			defaultPeriodic = 5
+			defaultDaily    = 7
+			defaultWeekly   = 5
+			defaultMonthy   = 12
+		)
+
+		BeforeEach(func() {
+			policiesBefore = numberOfSchedulePoliciesInCluster(c)
+			policyName = ""
+			isPolicyCreatedInTestCase = false
+		})
+
+		AfterEach(func() {
+
+			// Delete the policy after the test.
+			// Delete only if it was created.
+			// Controlled by the isPolicyCreatedInTestCase boolean
+			if isPolicyCreatedInTestCase {
+
+				resp, err := c.Delete(
+					context.Background(),
+					&api.SdkSchedulePolicyDeleteRequest{
+						Name: policyName,
+					},
+				)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(resp).NotTo(BeNil())
+			}
+		})
+
+		It("Should create Daily Schedule Policy with default values", func() {
+			policyName = "create-daily-policy-default-" + time.Now().String()
+			policy := &api.SdkSchedulePolicyCreateRequest{
+				SchedulePolicy: &api.SdkSchedulePolicy{
+					Name: policyName,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							PeriodType: &api.SdkSchedulePolicyInterval_Daily{
+								Daily: &api.SdkSchedulePolicyIntervalDaily{},
+							},
+						},
+					},
+				},
+			}
+			resp, err := c.Create(
+				context.Background(),
+				policy,
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp).NotTo(BeNil())
+
+			// Test if the policy got created.
+			policiesAfter = numberOfSchedulePoliciesInCluster(c)
+			Expect(policiesAfter).To(BeEquivalentTo(policiesBefore + 1))
+			isPolicyCreatedInTestCase = true
+
+			// Test with Inspect
+
+			By("Inspecting the created policy")
+			inspectResponse, err := c.Inspect(
+				context.Background(),
+				&api.SdkSchedulePolicyInspectRequest{
+					Name: policyName,
+				},
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(inspectResponse).NotTo(BeNil())
+			Expect(inspectResponse.Policy.Name).To(BeEquivalentTo(policy.SchedulePolicy.Name))
+			Expect(inspectResponse.GetPolicy().GetSchedules()).To(HaveLen(len(policy.GetSchedulePolicy().GetSchedules())))
+			Expect(inspectResponse.Policy.GetSchedules()[0].Retain).To(BeEquivalentTo(defaultDaily))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetDaily().Hour).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetDaily().Hour))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetDaily().Minute).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetDaily().Minute))
+		})
+
+		It("Should create Periodic Schedule Policy with default values", func() {
+			policyName = "create-periodic-policy-default-" + time.Now().String()
+			policy := &api.SdkSchedulePolicyCreateRequest{
+				SchedulePolicy: &api.SdkSchedulePolicy{
+					Name: policyName,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							//Retain: 3,
+							PeriodType: &api.SdkSchedulePolicyInterval_Periodic{
+								Periodic: &api.SdkSchedulePolicyIntervalPeriodic{},
+							},
+						},
+					},
+				},
+			}
+			resp, err := c.Create(
+				context.Background(),
+				policy,
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp).NotTo(BeNil())
+
+			// Test if the policy got created.
+			policiesAfter = numberOfSchedulePoliciesInCluster(c)
+			Expect(policiesAfter).To(BeEquivalentTo(policiesBefore + 1))
+			isPolicyCreatedInTestCase = true
+
+			// Test with Inspect
+
+			By("Inspecting the created policy")
+			inspectResponse, err := c.Inspect(
+				context.Background(),
+				&api.SdkSchedulePolicyInspectRequest{
+					Name: policyName,
+				},
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(inspectResponse).NotTo(BeNil())
+			Expect(inspectResponse.Policy.Name).To(BeEquivalentTo(policy.SchedulePolicy.Name))
+			Expect(inspectResponse.GetPolicy().GetSchedules()).To(HaveLen(len(policy.GetSchedulePolicy().GetSchedules())))
+			Expect(inspectResponse.Policy.GetSchedules()[0].Retain).To(BeEquivalentTo(defaultPeriodic))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetPeriodic().Seconds).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetPeriodic().Seconds))
+		})
+
+		It("Should create Weekly Schedule Policy with default values", func() {
+			policyName = "create-weekly-policy-default-" + time.Now().String()
+			policy := &api.SdkSchedulePolicyCreateRequest{
+				SchedulePolicy: &api.SdkSchedulePolicy{
+					Name: policyName,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							PeriodType: &api.SdkSchedulePolicyInterval_Weekly{
+								Weekly: &api.SdkSchedulePolicyIntervalWeekly{},
+							},
+						},
+					},
+				},
+			}
+			resp, err := c.Create(
+				context.Background(),
+				policy,
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp).NotTo(BeNil())
+
+			// Test if the policy got created.
+			policiesAfter = numberOfSchedulePoliciesInCluster(c)
+			Expect(policiesAfter).To(BeEquivalentTo(policiesBefore + 1))
+			isPolicyCreatedInTestCase = true
+
+			// Test with Inspect
+
+			By("Inspecting the created policy")
+			inspectResponse, err := c.Inspect(
+				context.Background(),
+				&api.SdkSchedulePolicyInspectRequest{
+					Name: policyName,
+				},
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(inspectResponse).NotTo(BeNil())
+			Expect(inspectResponse.Policy.Name).To(BeEquivalentTo(policy.SchedulePolicy.Name))
+			Expect(inspectResponse.GetPolicy().GetSchedules()).To(HaveLen(len(policy.GetSchedulePolicy().GetSchedules())))
+			Expect(inspectResponse.Policy.GetSchedules()[0].Retain).To(BeEquivalentTo(defaultWeekly))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetWeekly().Hour).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetWeekly().Hour))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetWeekly().Minute).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetWeekly().Minute))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetWeekly().Day).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetWeekly().Day))
+		})
+
+		It("Should create Monthly Schedule Policy with default values", func() {
+			policyName = "create-monthly-policy-default-" + time.Now().String()
+			policy := &api.SdkSchedulePolicyCreateRequest{
+				SchedulePolicy: &api.SdkSchedulePolicy{
+					Name: policyName,
+					Schedules: []*api.SdkSchedulePolicyInterval{
+						&api.SdkSchedulePolicyInterval{
+							PeriodType: &api.SdkSchedulePolicyInterval_Monthly{
+								Monthly: &api.SdkSchedulePolicyIntervalMonthly{
+									Day: 1,
+								},
+							},
+						},
+					},
+				},
+			}
+			resp, err := c.Create(
+				context.Background(),
+				policy,
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp).NotTo(BeNil())
+
+			// Test if the policy got created.
+			policiesAfter = numberOfSchedulePoliciesInCluster(c)
+			Expect(policiesAfter).To(BeEquivalentTo(policiesBefore + 1))
+			isPolicyCreatedInTestCase = true
+
+			// Test with Inspect
+
+			By("Inspecting the created policy")
+			inspectResponse, err := c.Inspect(
+				context.Background(),
+				&api.SdkSchedulePolicyInspectRequest{
+					Name: policyName,
+				},
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(inspectResponse).NotTo(BeNil())
+			Expect(inspectResponse.Policy.Name).To(BeEquivalentTo(policy.SchedulePolicy.Name))
+			Expect(inspectResponse.GetPolicy().GetSchedules()).To(HaveLen(len(policy.GetSchedulePolicy().GetSchedules())))
+			Expect(inspectResponse.Policy.GetSchedules()[0].Retain).To(BeEquivalentTo(defaultMonthy))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetWeekly().Hour).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetWeekly().Hour))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetWeekly().Minute).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetWeekly().Minute))
+			Expect(inspectResponse.Policy.GetSchedules()[0].GetWeekly().Day).To(BeEquivalentTo(policy.SchedulePolicy.GetSchedules()[0].GetWeekly().Day))
+		})
 	})
 
 	Describe("Create", func() {
